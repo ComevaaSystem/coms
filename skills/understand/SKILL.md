@@ -97,6 +97,15 @@ The stated metric and the real success criterion are often different things, and
 gap is multifactorial: sometimes it is cost per lead, sometimes it is looking good
 internally, sometimes it is one flagship deal.
 
+- When the engagement exists to test a channel, make the decision explicit: "In six
+  months, what will make you say we continue, and what will make you say we stop?"
+  A kill criterion defined at the start protects both sides; discovered at the
+  review, it is suffered.
+- Before accepting any target, establish the base rate: what do the existing
+  customers, partners, or campaigns ACTUALLY do today? A goal of 30 units per
+  partner per year means nothing until you know what current partners deliver.
+  The number usually exists in their own data and nobody has looked.
+
 - Shift the frame from lead to revenue on day one: "You may measure me on cost per
   lead at first, but in the end this will be judged on signatures. Are we aligned
   on that?" A more expensive lead that converts better is often the right trade,
@@ -172,16 +181,31 @@ A generic campaign without a dispatch mechanism is a pile of unsorted leads.
 - **Challenge at the moment of contradiction, with numbers.** A stated objective
   that fails its own arithmetic, a belief contradicted by their own data: show both
   sides, let them decide. An accepted gap is noted; an unseen gap is a fault.
+- **Offer your hypothesis AFTER their answer, never in its place.** Ask, let the
+  answer unfold fully, then propose your reading to confirm or reject. A hypothesis
+  offered too early gets validated out of politeness and buries the real answer.
+- **Never commit to a number without data.** "Easily achievable" is a promise with
+  nothing under it. The honest form is a bracket with its condition and a date:
+  "between X and Y depending on the filters we set; I confirm after two weeks of
+  data."
+- **Name your data dependencies out loud, with a date.** When a number lives in
+  THEIR systems and you cannot verify it, say so and turn it into a framing item:
+  "I cannot answer for this figure until I have access to X; can we fix that by
+  the 15th?" A dependency stated is professional; a dependency suffered in silence
+  reads as negligence.
 - **Answers in free text are the material.** When they answer beside the question,
   the free answer wins and is kept verbatim.
 
-## Closing: three gestures, executed in the session
+## Closing: four gestures, executed in the session
 
-1. Agree the communication channel and the follow-up rhythm, and set the recurring
+1. **Restate out loud before hanging up**: here is what I understood, here is what
+   we decided, here is what stays open. Corrections cost nothing while everyone is
+   still in the room; a recap deferred to email lets misunderstandings set.
+2. Agree the communication channel and the follow-up rhythm, and set the recurring
    slot NOW, not "we will find a date".
-2. Announce the written recap: what was learned, the to-do for each side, who
+3. Announce the written recap: what was learned, the to-do for each side, who
    validates what.
-3. Name the first concrete production and its date, so the engagement starts moving
+4. Name the first concrete production and its date, so the engagement starts moving
    before the goodbye.
 
 ## Output
