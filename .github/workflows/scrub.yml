@@ -1,0 +1,20 @@
+# Blocking scrub: publication is refused while client data remains in the tree.
+# The blocklist is NEVER committed. It lives in the SCRUB_BLOCKLIST repository
+# secret (one token per line). The scrub fails on an empty list on purpose: a
+# missing secret must not turn the check green.
+name: scrub
+on:
+  push:
+  pull_request:
+jobs:
+  scrub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run blocking scrub
+        env:
+          SCRUB_BLOCKLIST: ${{ secrets.SCRUB_BLOCKLIST }}
+        run: python3 scripts/scrub.py
