@@ -8,6 +8,28 @@ face de soi, etape par etape, d'un business qu'on decouvre jusqu'aux campagnes q
 tournent. Objectif numero 1 : la notoriete. La boucle : travail client, skill
 amelioree, release mensuelle, contenu LinkedIn.
 
+## Vision et positionnement
+
+Turn paid media into a measurable pipeline channel. Le parcours se presente comme
+une BOUCLE, pas une liste : comprendre, planifier, travailler la regie, produire la
+crea, analyser, et l'analyse re-nourrit la comprehension et le plan. La boucle se
+ferme dans le CRM, au cout par etape qualifiee, et ce signal remonte aux regies
+(conversion leads, import offline, valeurs par etape). Version lead gen de la vision
+The Cirqle (qui mesure en ROAS e-commerce) ; precedent du modele ouvert : Winning by
+Design, dont le Bowtie et SPICED sont publies et financent formation et services.
+
+Positionnement : profondeur d'un canal, pas largeur du marketing. Les repos de
+skills marketing existants (OpenClaudia, 75 skills generiques ; Eric Siu, tout sauf
+le paid) laissent vide le couloir "doctrine paid complete d'un praticien, seuils
+chiffres inclus". C'est ce couloir qu'on prend, et la boucle fermee ads vers CRM
+sans outil a 1 500 dollars par mois est l'argument.
+
+Doctrine assumee face a Refine Labs : capture par formulaires puis qualification
+APRES via la boucle CRM, pas d'ungating dogmatique. On prend leur lucidite de mesure
+(l'attribution logicielle sous-compte, le declaratif complete), pas leur doctrine de
+capture. La cible "agentic platform" (Cirqle, Omneky vendent leur MCP comme
+argument) est le positionnement vise de la phase MCP, apres la V1.
+
 ## Public
 
 Tout le spectre : consultant, marketer in-house, dirigeant qui gere son propre compte.
