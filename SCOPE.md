@@ -42,7 +42,7 @@ Skills et repo en anglais (reecriture, pas traduction : les regles de ton franca
 ont un equivalent anglais a definir par skill). Une skill menee en anglais conduit
 l'entretien dans la langue de l'utilisateur. Documents de travail internes en francais.
 
-## Le parcours V1, cinq etapes
+## Le parcours V1, six etapes
 
 1. `understand` : comprendre le business. Grille d'entretien (qui achete, structure de
    l'offre, dispatch, focus, budget, ressources), onboarding inclus. La vitrine du
@@ -54,6 +54,13 @@ l'entretien dans la langue de l'utilisateur. Documents de travail internes en fr
 4. Briefs crea : `static-briefs`, `ugc-briefs`. Reecriture anglais et anonymisation.
 5. `analyze` : lire les comptes apres lancement, decisions monitorees, la boucle
    d'optimisation. A creer depuis la methode d'audit existante.
+6. `steer` : le pilotage, essentiel au metier (decision du 2026-08-26). La
+   perception du travail par le client = les leads + ce qu'on lui raconte. Brief
+   d'avant-call (chiffres reconcilies, engagements ouverts, questions du jour),
+   conduite du rituel hebdo, restitution d'apres-call (decisions, to-dos,
+   responsables, dates), narration du travail sur le canal quotidien. Fonde sur le
+   bilan des 19 calls reels : tout ce que le consultant delegue a la machine pour
+   garder la relation, la performance et la maitrise. A creer.
 
 Chaque skill tourne seule sur les documents fournis par l'utilisateur. Aucune
 dependance au MCP Comevaa en V1.
