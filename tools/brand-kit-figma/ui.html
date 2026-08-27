@@ -1,9 +1,7 @@
 <style>
   * { box-sizing: border-box; margin: 0; font-family: "Archivo", -apple-system, "Segoe UI", sans-serif; }
-  body { background: #F7F5F2; color: #141414; padding: 14px 16px; font-size: 12px; }
-  h1 { font-size: 14px; font-weight: 600; }
-  .sub { color: #6B6A66; margin: 2px 0 12px; }
-  h2 { font-size: 11px; font-weight: 600; margin: 14px 0 6px; }
+  body { background: #F7F5F2; color: #141414; padding: 12px 14px; font-size: 12px; }
+  h2 { font-size: 11px; font-weight: 600; margin: 12px 0 6px; }
   .card { background: #FCFBF9; border: 1px solid #B9B5AB; border-radius: 10px; padding: 8px 12px; }
   .row { display: flex; align-items: center; justify-content: space-between; padding: 3px 0; gap: 8px; }
   .row label { color: #3f3e3b; flex: 1; }
@@ -31,10 +29,15 @@
   .selinfo { color: #6B6A66; font-size: 11px; }
   a.dl { display: none; }
   details summary { cursor: pointer; font-size: 11px; font-weight: 600; padding: 4px 0; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 10px; background: #F1F0EB; border-radius: 999px; padding: 3px; }
+  .tabs button { flex: 1; border: 0; background: transparent; border-radius: 999px; padding: 7px 0; font-size: 12px; color: #6B6A66; }
+  .tabs button.on { background: #FCFBF9; color: #141414; font-weight: 600; box-shadow: 0 1px 2px rgba(20,20,20,0.08); }
+  .tab { display: none; }
+  .tab.on { display: block; }
+  .live-bar { display: flex; align-items: center; gap: 6px; margin-top: 8px; padding: 8px 10px; background: #F1F0EB; border-radius: 8px; }
+  .live-bar label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .live-hint { color: #6B6A66; font-size: 11px; }
 </style>
-
-<h1>Brand Kit</h1>
-<div class="sub">Pick a scope, check what applies, exclusions are respected.</div>
 
 <div class="setup" id="setup">
   <p>This file has no brand kit yet. The wizard asks three questions and
@@ -84,86 +87,119 @@
   </div>
 </div>
 
-<h2>Kit</h2>
-<div class="card">
-  <div class="row">
-    <select id="kit-list"><option value="">Current file kit</option></select>
-  </div>
-  <div class="btnrow">
-    <input type="text" id="kit-name" placeholder="kit name">
-    <button class="mini" id="kit-save">Save</button>
-    <button class="mini" id="kit-delete">Delete</button>
-    <button class="mini" id="wizard-open-2">Wizard</button>
-  </div>
-  <details style="margin-top:6px">
-    <summary>Import / paste a tokens.json</summary>
-    <textarea id="kit-json" placeholder='{"colors":{"accent":"#2B47E8", ...}}'></textarea>
-    <div class="btnrow"><button class="mini" id="kit-import">Load into panel</button></div>
-  </details>
+<div class="tabs">
+  <button id="tab-tokens" class="on">Tokens</button>
+  <button id="tab-kits">Kits</button>
+  <button id="tab-options">Options</button>
 </div>
 
-<h2>Scope</h2>
-<div class="card">
-  <div class="radios">
-    <label><input type="radio" name="scope" value="selection"> Selection <span class="selinfo" id="selinfo"></span></label>
-    <label><input type="radio" name="scope" value="page"> Current page</label>
-    <label><input type="radio" name="scope" value="file" checked> Whole file</label>
+<!-- ============ TOKENS : the everyday view ============ -->
+<div class="tab on" id="panel-tokens">
+  <h2>Accent</h2>
+  <div class="card" id="accent-box"></div>
+  <h2>Light range</h2>
+  <div class="card" id="light-box"></div>
+  <h2>Dark range</h2>
+  <div class="card" id="dark-box"></div>
+  <h2>Radii</h2>
+  <div class="card" id="radius-box"></div>
+  <h2>Materials</h2>
+  <div class="card" id="mat-box">
+    <div class="row"><label>Light grain (paper, discs)</label><input type="range" id="g-light" min="0" max="20" value="5"><span class="val" id="v-light">5</span></div>
+    <div class="row"><label>Strong grain (capsules, CTA)</label><input type="range" id="g-strong" min="0" max="30" value="12"><span class="val" id="v-strong">12</span></div>
+    <div class="row"><label>Grain density</label><input type="range" id="g-dens" min="10" max="100" value="50"><span class="val" id="v-dens">50</span></div>
+    <div class="row"><label>Frosted glass (blur)</label><input type="range" id="g-blur" min="0" max="80" value="34"><span class="val" id="v-blur">34</span></div>
   </div>
-  <div class="note">Colors and radii live in variables, which are global by nature. Scope governs gradients, grain, glass and re-linking.</div>
+
+  <div class="btnrow" style="margin-top:12px">
+    <button class="ghost" id="analyze">Analyze</button>
+    <button class="primary" id="apply">Apply</button>
+  </div>
+  <div class="live-bar">
+    <label><input type="checkbox" id="live"> Live</label>
+    <span class="live-hint">colors and radii apply as you drag; gradients and grain need Apply</span>
+  </div>
+  <div class="report" id="report"></div>
 </div>
 
-<h2>What to apply</h2>
-<div class="card">
-  <div class="checks">
-    <label><input type="checkbox" id="ap-colors" checked> Colors</label>
-    <label><input type="checkbox" id="ap-radii" checked> Radii</label>
-    <label><input type="checkbox" id="ap-gradients" checked> Gradients</label>
-    <label><input type="checkbox" id="ap-grain" checked> Grain</label>
-    <label><input type="checkbox" id="ap-glass" checked> Frosted glass</label>
-    <label><input type="checkbox" id="ap-relink"> Re-link matching colors</label>
+<!-- ============ KITS : save, load, share ============ -->
+<div class="tab" id="panel-kits">
+  <h2>Named kits</h2>
+  <div class="card">
+    <div class="row">
+      <select id="kit-list"><option value="">Current file kit</option></select>
+    </div>
+    <div class="btnrow">
+      <input type="text" id="kit-name" placeholder="kit name">
+      <button class="mini" id="kit-save">Save</button>
+      <button class="mini" id="kit-delete">Delete</button>
+    </div>
+    <div class="note">A kit is the whole panel saved under a name, stored in this file. One per client.</div>
+  </div>
+  <h2>Start over</h2>
+  <div class="card">
+    <div class="btnrow"><button class="ghost" id="wizard-open-2">Run the wizard again</button></div>
+    <div class="note">Three steps, then a starter set of components generated on the "Brand Kit" page, all bound to the variables.</div>
+  </div>
+  <h2>Import / export</h2>
+  <div class="card">
+    <details open>
+      <summary>Paste a tokens.json</summary>
+      <textarea id="kit-json" placeholder='{"colors":{"accent":"#2B47E8", ...}}'></textarea>
+      <div class="btnrow"><button class="mini" id="kit-import">Load into panel</button></div>
+    </details>
+    <div class="btnrow"><button class="ghost" id="export">Export tokens.json + CSS</button></div>
+    <div class="note">The exported CSS carries the same tokens as custom properties: one source of truth for Figma and the website.</div>
   </div>
 </div>
 
-<h2>Off brand</h2>
-<div class="card">
-  <div class="btnrow">
-    <button class="ghost" id="exclude">Take selection off brand</button>
-    <button class="ghost" id="include">Re-include</button>
+<!-- ============ OPTIONS : scope, categories, exclusions ============ -->
+<div class="tab" id="panel-options">
+  <h2>Scope of Apply</h2>
+  <div class="card">
+    <div class="radios">
+      <label><input type="radio" name="scope" value="selection"> Selection <span class="selinfo" id="selinfo"></span></label>
+      <label><input type="radio" name="scope" value="page"> Current page</label>
+      <label><input type="radio" name="scope" value="file" checked> Whole file</label>
+    </div>
+    <div class="note">Colors and radii live in variables, global by nature. Scope governs gradients, grain, glass and re-linking.</div>
   </div>
-  <div class="note">An off-brand element is detached from variables and ignored by every sweep: the safety valve against "everything looks the same".</div>
+  <h2>What Apply touches</h2>
+  <div class="card">
+    <div class="checks">
+      <label><input type="checkbox" id="ap-colors" checked> Colors</label>
+      <label><input type="checkbox" id="ap-radii" checked> Radii</label>
+      <label><input type="checkbox" id="ap-gradients" checked> Gradients</label>
+      <label><input type="checkbox" id="ap-grain" checked> Grain</label>
+      <label><input type="checkbox" id="ap-glass" checked> Frosted glass</label>
+      <label><input type="checkbox" id="ap-relink"> Re-link matching colors</label>
+    </div>
+    <div class="note">What is not checked is not touched.</div>
+  </div>
+  <h2>Off brand</h2>
+  <div class="card">
+    <div class="btnrow">
+      <button class="ghost" id="exclude">Take selection off brand</button>
+      <button class="ghost" id="include">Re-include</button>
+    </div>
+    <div class="note">An off-brand element is detached from the variables and ignored by every sweep: a free piece stays free.</div>
+  </div>
 </div>
 
-<h2>Accent</h2>
-<div class="card" id="accent-box"></div>
-<h2>Light range</h2>
-<div class="card" id="light-box"></div>
-<h2>Dark range</h2>
-<div class="card" id="dark-box"></div>
-<h2>Radii</h2>
-<div class="card" id="radius-box"></div>
-<h2>Materials</h2>
-<div class="card" id="mat-box">
-  <div class="row"><label>Light grain (paper, discs)</label><input type="range" id="g-light" min="0" max="20" value="5"><span class="val" id="v-light">5</span></div>
-  <div class="row"><label>Strong grain (capsules, CTA)</label><input type="range" id="g-strong" min="0" max="30" value="12"><span class="val" id="v-strong">12</span></div>
-  <div class="row"><label>Grain density</label><input type="range" id="g-dens" min="10" max="100" value="50"><span class="val" id="v-dens">50</span></div>
-  <div class="row"><label>Frosted glass (blur)</label><input type="range" id="g-blur" min="0" max="80" value="34"><span class="val" id="v-blur">34</span></div>
-</div>
-
-<div class="btnrow" style="margin-top:14px">
-  <button class="ghost" id="analyze">Analyze</button>
-  <button class="primary" id="apply">Apply</button>
-</div>
-<div class="checks" style="margin-top:6px">
-  <label><input type="checkbox" id="live"> Live mode: colors and radii apply the instant a control moves (gradients and grain still need Apply)</label>
-</div>
-<div class="report" id="report"></div>
-<div class="btnrow">
-  <button class="ghost" id="export">Export tokens.json + CSS</button>
-</div>
 <div class="err" id="err"></div>
 <a class="dl" id="dl"></a>
 
 <script>
+  // ----- tabs
+  for (const t of ["tokens", "kits", "options"]) {
+    document.getElementById("tab-" + t).addEventListener("click", () => {
+      for (const u of ["tokens", "kits", "options"]) {
+        document.getElementById("tab-" + u).classList.toggle("on", u === t);
+        document.getElementById("panel-" + u).classList.toggle("on", u === t);
+      }
+    });
+  }
+
   const COLORS = [
     ["accent", "Accent (the signal)", "accent-box"],
     ["paper", "Paper", "light-box"], ["paperCard", "Paper card", "light-box"],
@@ -293,6 +329,7 @@
       if (liveOn()) post({ type: "live", key, value: Number(e.target.value) });
     });
   }
+
   document.getElementById("analyze").addEventListener("click", () => post({ type: "analyze", payload: collect() }));
   applyBtn.addEventListener("click", () => {
     applyBtn.disabled = true; applyBtn.textContent = "Working";
