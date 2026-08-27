@@ -46,17 +46,10 @@
 <div class="setup" id="setup" style="display:none"></div>
 
 <div class="setup" id="wizard" style="display:none">
-  <div id="wz-0">
-    <div class="eyebrow">3 steps, 1 minute</div>
-    <p style="font-size:15px;font-weight:600;color:#141414;margin-bottom:6px">Let's build your brand kit.</p>
-    <p>Pick a color and a shape. You get a "Brand Kit" page with ready-made
-    components. Nothing else is touched.</p>
-    <div class="btnrow"><button class="primary" id="wz-start">Start</button></div>
-    <div class="btnrow"><button class="mini" id="bootstrap">Advanced: variables only</button></div>
-  </div>
-  <div id="wz-1" style="display:none">
-    <p><b>Step 1 of 3: your colors.</b> The accent is your brand's one
-    strong color, the one buttons and highlights will use.</p>
+  <div id="wz-create">
+    <div class="eyebrow">one screen, one click</div>
+    <p style="font-size:15px;font-weight:600;color:#141414;margin-bottom:6px">Create your kit.</p>
+    <p>Everything lands on a "Brand Kit" page, already in your brand. All of it stays adjustable from Tokens.</p>
     <div class="row"><label>Accent</label><input type="color" id="wz-accent" value="#2B47E8"></div>
     <div class="row"><label>Paper (light ground)</label><input type="color" id="wz-paper" value="#F7F5F2"></div>
     <div class="row"><label>Dark surface</label><input type="color" id="wz-dark" value="#161615"></div>
@@ -66,32 +59,22 @@
         <option>Lora</option><option>DM Sans</option>
       </select>
     </div>
-    <div class="btnrow"><button class="primary" id="wz-next-1">Next</button></div>
-  </div>
-  <div id="wz-2" style="display:none">
-    <p><b>Step 2 of 3: your shapes.</b> How round the corners are, and how
-    much texture. You can change all of this later.</p>
-    <div class="radios">
-      <label><input type="radio" name="wz-shape" value="sharp"> Sharp (0)</label>
-      <label><input type="radio" name="wz-shape" value="soft" checked> Soft (12 / 18)</label>
-      <label><input type="radio" name="wz-shape" value="round"> Round (20 / 26)</label>
+    <div class="radios" style="margin-top:6px">
+      <label><input type="radio" name="wz-shape" value="sharp"> Sharp</label>
+      <label><input type="radio" name="wz-shape" value="soft" checked> Soft</label>
+      <label><input type="radio" name="wz-shape" value="round"> Round</label>
     </div>
-    <div class="row"><label>Grain</label><input type="range" id="wz-grain" min="0" max="20" value="5"><span class="val" id="wz-grain-v">5</span></div>
-    <div class="row"><label>Frosted glass (blur)</label><input type="range" id="wz-blur" min="0" max="80" value="34"><span class="val" id="wz-blur-v">34</span></div>
-    <div class="btnrow"><button class="ghost" id="wz-back-2">Back</button><button class="primary" id="wz-next-2">Next</button></div>
-  </div>
-  <div id="wz-3" style="display:none">
-    <p><b>Step 3 of 3: what I create for you.</b> These land on a new
-    "Brand Kit" page in this file, already in your brand.</p>
+    <h2>Components to create</h2>
     <div class="checks">
-      <label><input type="checkbox" id="wz-buttons" checked> Buttons</label>
-      <label><input type="checkbox" id="wz-cards" checked> Card</label>
-      <label><input type="checkbox" id="wz-inputs" checked> Input</label>
-      <label><input type="checkbox" id="wz-badges" checked> Badge</label>
-      <label><input type="checkbox" id="wz-station" checked> Diagram disc</label>
-      <label><input type="checkbox" id="wz-nav" checked> Nav bar</label>
+      <label><input type="checkbox" id="wz-g-basics" checked> Basics: buttons, badges, inputs, checkbox, toggle</label>
+      <label><input type="checkbox" id="wz-g-cards" checked> Cards: card, stat, pricing, quote</label>
+      <label><input type="checkbox" id="wz-g-navigation" checked> Navigation: nav, tabs, breadcrumb, pagination, footer</label>
+      <label><input type="checkbox" id="wz-g-overlays" checked> Overlays: modal, tooltip, alert</label>
+      <label><input type="checkbox" id="wz-g-data" checked> Data: table</label>
+      <label><input type="checkbox" id="wz-g-diagram" checked> Diagram: disc, stepper, legend</label>
     </div>
-    <div class="btnrow"><button class="ghost" id="wz-back-3">Back</button><button class="primary" id="wz-generate">Create my kit</button></div>
+    <div class="btnrow"><button class="primary" id="wz-generate">Create my kit</button></div>
+    <div class="btnrow"><button class="mini" id="bootstrap">Advanced: variables only</button><button class="mini" id="wz-cancel">Cancel</button></div>
   </div>
   <div id="wz-done" style="display:none">
     <div class="eyebrow">done</div>
@@ -306,36 +289,27 @@
   const wzShow = (n) => {
     document.getElementById("wizard").style.display = "block";
     document.getElementById("main").style.display = "none";
-    for (const i of [0, 1, 2, 3, "done"]) {
+    for (const i of ["create", "done"]) {
       const el = document.getElementById("wz-" + i);
-      if (el) el.style.display = String(i) === String(n) ? "block" : "none";
+      if (el) el.style.display = i === n ? "block" : "none";
     }
   };
   const wzHide = () => {
     document.getElementById("wizard").style.display = "none";
     document.getElementById("main").style.display = "block";
   };
-  document.getElementById("wz-start").addEventListener("click", () => wzShow(1));
-  document.getElementById("wizard-open-2").addEventListener("click", () => wzShow(0));
-  document.getElementById("start-wizard").addEventListener("click", () => wzShow(0));
+  document.getElementById("wizard-open-2").addEventListener("click", () => wzShow("create"));
+  document.getElementById("start-wizard").addEventListener("click", () => wzShow("create"));
+  document.getElementById("wz-cancel").addEventListener("click", wzHide);
   document.getElementById("wz-close").addEventListener("click", () => {
     wzHide();
     document.getElementById("tab-tokens").click();
   });
-  document.getElementById("wz-next-1").addEventListener("click", () => wzShow(2));
-  document.getElementById("wz-back-2").addEventListener("click", () => wzShow(1));
-  document.getElementById("wz-next-2").addEventListener("click", () => wzShow(3));
-  document.getElementById("wz-back-3").addEventListener("click", () => wzShow(2));
-  for (const id of ["grain", "blur"]) {
-    const inp = document.getElementById("wz-" + id);
-    inp.addEventListener("input", () => document.getElementById("wz-" + id + "-v").textContent = inp.value);
-  }
   document.getElementById("wz-generate").addEventListener("click", () => {
     const shape = document.querySelector('input[name="wz-shape"]:checked').value;
     const radii = shape === "sharp" ? { pill: 999, card: 2, sheet: 4 }
       : shape === "round" ? { pill: 999, card: 20, sheet: 26 }
       : { pill: 999, card: 12, sheet: 18 };
-    const g = Number(document.getElementById("wz-grain").value);
     const payload = {
       colors: {
         accent: document.getElementById("wz-accent").value,
@@ -343,20 +317,20 @@
         darkSurface: document.getElementById("wz-dark").value
       },
       radii,
-      grain: { light: g, strong: Math.min(30, Math.round(g * 2.4)), density: 0.5 },
-      blur: Number(document.getElementById("wz-blur").value),
+      grain: { light: 5, strong: 12, density: 0.5 },
+      blur: 34,
       font: document.getElementById("wz-font").value,
-      generate: {
-        buttons: document.getElementById("wz-buttons").checked,
-        cards: document.getElementById("wz-cards").checked,
-        inputs: document.getElementById("wz-inputs").checked,
-        badges: document.getElementById("wz-badges").checked,
-        station: document.getElementById("wz-station").checked,
-        nav: document.getElementById("wz-nav").checked
+      groups: {
+        basics: document.getElementById("wz-g-basics").checked,
+        cards: document.getElementById("wz-g-cards").checked,
+        navigation: document.getElementById("wz-g-navigation").checked,
+        overlays: document.getElementById("wz-g-overlays").checked,
+        data: document.getElementById("wz-g-data").checked,
+        diagram: document.getElementById("wz-g-diagram").checked
       }
     };
     document.getElementById("wz-generate").disabled = true;
-    document.getElementById("wz-generate").textContent = "Generating";
+    document.getElementById("wz-generate").textContent = "Creating";
     post({ type: "wizard-generate", payload });
   });
 
@@ -416,11 +390,11 @@
     if (m.type === "wizard-done") {
       document.getElementById("wz-generate").disabled = false;
       document.getElementById("wz-generate").textContent = "Create my kit";
-      if (m.error) { document.getElementById("err").textContent = m.error; wzShow(3); }
+      if (m.error) { document.getElementById("err").textContent = m.error; wzShow("create"); }
       else wzShow("done");
     }
     if (m.type === "state") {
-      if (m.state.missing && document.getElementById("wizard").style.display !== "block") wzShow(0);
+      if (m.state.missing && document.getElementById("wizard").style.display !== "block") wzShow("create");
       document.getElementById("start-status").textContent = m.state.missing
         ? "No kit in this file yet."
         : "Kit loaded from this file.";

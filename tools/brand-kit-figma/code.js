@@ -353,9 +353,10 @@ async function liveSet(key, value) {
   }
 }
 
-// ---------- starter components (the wizard's Generate step)
+// ---------- starter components (the wizard's Create step)
 // Everything is BOUND to the variables, so moving a token later moves every
 // generated component instantly. Gradients and grain follow on Apply.
+// The library is organized in families; choices.groups says which ones to build.
 async function generateStarter(choices) {
   const vm = await getVarMap();
   if (!vm) return { error: "Initialize the brand kit first." };
@@ -370,8 +371,9 @@ async function generateStarter(choices) {
         node.setBoundVariable(c, V(name));
     } catch (e) {}
   };
-  const GRAIN_S = { type: "NOISE", noiseSize: 1, noiseType: "MONOTONE", color: { r: 0, g: 0, b: 0, a: (choices.grain.light || 5) / 100 }, density: choices.grain.density || 0.5, visible: true };
-  const GRAIN_B = { type: "NOISE", noiseSize: 1, noiseType: "MONOTONE", color: { r: 0, g: 0, b: 0, a: (choices.grain.strong || 12) / 100 }, density: choices.grain.density || 0.5, visible: true };
+  const grain = choices.grain || { light: 5, strong: 12, density: 0.5 };
+  const GRAIN_S = { type: "NOISE", noiseSize: 1, noiseType: "MONOTONE", color: { r: 0, g: 0, b: 0, a: (grain.light || 5) / 100 }, density: grain.density || 0.5, visible: true };
+  const GRAIN_B = { type: "NOISE", noiseSize: 1, noiseType: "MONOTONE", color: { r: 0, g: 0, b: 0, a: (grain.strong || 12) / 100 }, density: grain.density || 0.5, visible: true };
   const accent = val(COLOR_VARS.accent);
   const CTA_GRAD = { type: "GRADIENT_LINEAR", gradientTransform: [[1, 0, 0], [0, 1, 0]],
     gradientStops: [
@@ -380,19 +382,19 @@ async function generateStarter(choices) {
     ] };
 
   const family = choices.font || "Archivo";
-  const F = { r: family, m: family, sb: family };
   const load = async (style) => { await figma.loadFontAsync({ family, style }); return style; };
-  let reg = "Regular", med = "Medium", semi = "SemiBold";
+  let reg = "Regular", med = "Medium", semi = "SemiBold", light = "Light";
   try { await load("Regular"); } catch (e) { return { error: "Font \"" + family + "\" is not available in Figma." }; }
   try { await load("Medium"); } catch (e) { med = "Regular"; }
   try { await load("SemiBold"); } catch (e) { semi = med; }
+  try { await load("Light"); } catch (e) { light = reg; }
 
-  const text = (p, chars, style, size, colorVar) => {
+  const text = (p, chars, style, size, colorVar, raw) => {
     const t = figma.createText();
     t.fontName = { family, style };
     t.characters = chars;
     t.fontSize = size;
-    t.fills = [boundSolid(colorVar)];
+    t.fills = raw ? [{ type: "SOLID", color: raw }] : [boundSolid(colorVar)];
     p.appendChild(t);
     return t;
   };
@@ -400,8 +402,8 @@ async function generateStarter(choices) {
     const f = figma.createFrame();
     f.layoutMode = o.mode || "VERTICAL";
     f.itemSpacing = o.gap == null ? 10 : o.gap;
-    f.fills = o.fillVar ? [boundSolid(o.fillVar)] : [];
-    if (o.strokeVar) { f.strokes = [boundSolid(o.strokeVar)]; f.strokeWeight = 1; }
+    f.fills = o.fillVar ? [boundSolid(o.fillVar)] : (o.fills || []);
+    if (o.strokeVar) { f.strokes = [boundSolid(o.strokeVar)]; f.strokeWeight = o.sw || 1; }
     p.appendChild(f);
     if (p.layoutMode && p.layoutMode !== "NONE") {
       f.layoutSizingHorizontal = o.w || "HUG";
@@ -412,125 +414,355 @@ async function generateStarter(choices) {
     if (o.calign) f.counterAxisAlignItems = o.calign;
     return f;
   };
+  const comp = (name, o) => {
+    const c = figma.createComponent();
+    c.name = name;
+    c.layoutMode = (o && o.mode) || "VERTICAL";
+    c.itemSpacing = (o && o.gap != null) ? o.gap : 10;
+    if (o && o.fillVar) c.fills = [boundSolid(o.fillVar)]; else if (o && o.fills) c.fills = o.fills; else c.fills = [];
+    if (o && o.strokeVar) { c.strokes = [boundSolid(o.strokeVar)]; c.strokeWeight = o.sw || 1; }
+    if (o && o.pad) { c.paddingTop = c.paddingBottom = o.pad[0]; c.paddingLeft = c.paddingRight = o.pad[1]; }
+    if (o && o.align) c.primaryAxisAlignItems = o.align;
+    if (o && o.calign) c.counterAxisAlignItems = o.calign;
+    return c;
+  };
+  const fixW = (c, w) => { c.resize(w, Math.max(c.height, 10)); c.primaryAxisSizingMode = "AUTO"; c.counterAxisSizingMode = "FIXED"; };
+  const variants = (comps, setName, page) => {
+    const set = figma.combineAsVariants(comps, page);
+    set.name = setName;
+    set.layoutMode = "HORIZONTAL"; set.itemSpacing = 24;
+    set.paddingTop = set.paddingBottom = set.paddingLeft = set.paddingRight = 24;
+    return set;
+  };
+  const dot = (p, size, colorVar) => {
+    const d = figma.createEllipse();
+    d.resize(size, size);
+    d.fills = [boundSolid(colorVar)];
+    p.appendChild(d);
+    return d;
+  };
 
   // dedicated page
   let page = figma.root.children.find((p) => p.name === "Brand Kit");
   if (!page) { page = figma.createPage(); page.name = "Brand Kit"; }
   await figma.setCurrentPageAsync(page);
-  let x = 0;
+
   const made = [];
   const nodes = [];
-  const place = (comp) => { comp.x = x; comp.y = 0; x += comp.width + 80; made.push(comp.name); nodes.push(comp); };
+  let Y = 0;
+  const section = (label) => {
+    const t = figma.createText();
+    t.fontName = { family, style: semi };
+    t.characters = label;
+    t.fontSize = 20;
+    t.fills = [boundSolid(COLOR_VARS.ink)];
+    page.appendChild(t);
+    t.x = 0; t.y = Y;
+    Y += 44;
+  };
+  let rowX = 0, rowMax = 0;
+  const place = (node) => {
+    page.appendChild(node);
+    node.x = rowX; node.y = Y;
+    rowX += node.width + 60;
+    rowMax = Math.max(rowMax, node.height);
+    made.push(node.name);
+    nodes.push(node);
+  };
+  const endSection = () => { Y += rowMax + 90; rowX = 0; rowMax = 0; };
 
-  if (choices.generate.buttons) {
-    const mk = (variantName, primary) => {
-      const c = figma.createComponent();
-      c.name = variantName;
-      c.layoutMode = "HORIZONTAL";
-      c.counterAxisAlignItems = "CENTER";
-      c.paddingTop = c.paddingBottom = 10; c.paddingLeft = c.paddingRight = 20;
-      if (primary) { c.fills = [CTA_GRAD]; c.effects = [GRAIN_B]; }
-      else { c.fills = []; c.strokes = [boundSolid(COLOR_VARS.lineFaded)]; c.strokeWeight = 1; }
+  const G = choices.groups || {};
+
+  // ============ BASICS ============
+  if (G.basics) {
+    section("Basics");
+    // Button: kind x 3
+    const mkBtn = (kind) => {
+      const c = comp("kind=" + kind, { mode: "HORIZONTAL", calign: "CENTER", pad: [10, 20] });
+      if (kind === "primary") { c.fills = [CTA_GRAD]; c.effects = [GRAIN_B]; }
+      else if (kind === "secondary") { c.strokes = [boundSolid(COLOR_VARS.lineFaded)]; c.strokeWeight = 1; }
       bindRadius(c, RADIUS_VARS.pill);
-      const t = figma.createText();
-      t.fontName = { family, style: med }; t.characters = "Button"; t.fontSize = 13;
-      t.fills = primary ? [{ type: "SOLID", color: WHITE }] : [boundSolid(COLOR_VARS.ink)];
-      c.appendChild(t);
+      text(c, "Button", med, 13, kind === "primary" ? null : (kind === "ghost" ? COLOR_VARS.accent : COLOR_VARS.ink), kind === "primary" ? WHITE : null);
       return c;
     };
-    const set = figma.combineAsVariants([mk("kind=primary", true), mk("kind=secondary", false)], page);
-    set.name = "Button";
-    set.layoutMode = "HORIZONTAL"; set.itemSpacing = 24;
-    set.paddingTop = set.paddingBottom = set.paddingLeft = set.paddingRight = 24;
-    place(set);
+    place(variants([mkBtn("primary"), mkBtn("secondary"), mkBtn("ghost")], "Button", page));
+    // Badge: tone x 2
+    const mkBadge = (tone) => {
+      const c = comp("tone=" + tone, { mode: "HORIZONTAL", gap: 6, calign: "CENTER", pad: [4, 12] });
+      if (tone === "accent") c.fills = [boundSolid(COLOR_VARS.accentSoft)];
+      else { c.strokes = [boundSolid(COLOR_VARS.lineFaded)]; c.strokeWeight = 1; }
+      bindRadius(c, RADIUS_VARS.pill);
+      text(c, "Badge", med, 12, tone === "accent" ? COLOR_VARS.accent : COLOR_VARS.textMuted);
+      return c;
+    };
+    place(variants([mkBadge("accent"), mkBadge("neutral")], "Badge", page));
+    // Input
+    const input = comp("Input", { gap: 6 });
+    fixW(input, 280);
+    text(input, "Label", med, 12, COLOR_VARS.ink);
+    const ibox = frame(input, { w: "FILL", fillVar: COLOR_VARS.paperCard, strokeVar: COLOR_VARS.lineFaded, pad: [10, 12] });
+    bindRadius(ibox, RADIUS_VARS.card);
+    text(ibox, "Placeholder", reg, 13, COLOR_VARS.textMuted);
+    place(input);
+    // Select
+    const sel = comp("Select", { gap: 6 });
+    fixW(sel, 280);
+    text(sel, "Label", med, 12, COLOR_VARS.ink);
+    const sbox = frame(sel, { mode: "HORIZONTAL", w: "FILL", fillVar: COLOR_VARS.paperCard, strokeVar: COLOR_VARS.lineFaded, pad: [10, 12], align: "SPACE_BETWEEN", calign: "CENTER" });
+    bindRadius(sbox, RADIUS_VARS.card);
+    text(sbox, "Choose", reg, 13, COLOR_VARS.ink);
+    text(sbox, "v", med, 11, COLOR_VARS.textMuted);
+    place(sel);
+    // Textarea
+    const ta = comp("Textarea", { gap: 6 });
+    fixW(ta, 280);
+    text(ta, "Label", med, 12, COLOR_VARS.ink);
+    const tbox = frame(ta, { w: "FILL", fillVar: COLOR_VARS.paperCard, strokeVar: COLOR_VARS.lineFaded, pad: [10, 12] });
+    tbox.resize(tbox.width, 84); tbox.layoutSizingVertical = "FIXED";
+    bindRadius(tbox, RADIUS_VARS.card);
+    text(tbox, "Longer text", reg, 13, COLOR_VARS.textMuted);
+    place(ta);
+    // Checkbox: state x 2
+    const mkCheck = (on) => {
+      const c = comp("state=" + (on ? "checked" : "unchecked"), { mode: "HORIZONTAL", gap: 10, calign: "CENTER" });
+      const box = frame(c, { align: "CENTER", calign: "CENTER" });
+      box.resize(16, 16); box.primaryAxisSizingMode = "FIXED"; box.counterAxisSizingMode = "FIXED";
+      box.cornerRadius = 4;
+      if (on) { box.fills = [boundSolid(COLOR_VARS.accent)]; text(box, "x", med, 10, null, WHITE); }
+      else { box.strokes = [boundSolid(COLOR_VARS.lineFaded)]; box.strokeWeight = 1.5; }
+      text(c, "Checkbox", reg, 13, COLOR_VARS.ink);
+      return c;
+    };
+    place(variants([mkCheck(true), mkCheck(false)], "Checkbox", page));
+    // Toggle: state x 2
+    const mkToggle = (on) => {
+      const c = comp("state=" + (on ? "on" : "off"), { mode: "HORIZONTAL", calign: "CENTER", pad: [2, 2] });
+      c.resize(36, 20); c.primaryAxisSizingMode = "FIXED"; c.counterAxisSizingMode = "FIXED";
+      c.cornerRadius = 999;
+      if (on) { c.fills = [boundSolid(COLOR_VARS.accent)]; c.primaryAxisAlignItems = "MAX"; }
+      else { c.fills = [boundSolid(COLOR_VARS.paperInset)]; c.strokes = [boundSolid(COLOR_VARS.lineFaded)]; c.strokeWeight = 1; }
+      const knob = figma.createEllipse();
+      knob.resize(16, 16);
+      knob.fills = [{ type: "SOLID", color: WHITE }];
+      c.appendChild(knob);
+      return c;
+    };
+    place(variants([mkToggle(true), mkToggle(false)], "Toggle", page));
+    endSection();
   }
 
-  if (choices.generate.cards) {
-    const c = figma.createComponent();
-    c.name = "Card";
-    c.layoutMode = "VERTICAL"; c.itemSpacing = 10;
-    c.resize(300, 100);
-    c.primaryAxisSizingMode = "AUTO"; c.counterAxisSizingMode = "FIXED";
-    c.paddingTop = c.paddingBottom = 22; c.paddingLeft = c.paddingRight = 22;
-    c.fills = [boundSolid(COLOR_VARS.paperCard)];
-    c.strokes = [boundSolid(COLOR_VARS.lineFaded)]; c.strokeWeight = 1;
-    bindRadius(c, RADIUS_VARS.card);
-    const chip = frame(c, { mode: "HORIZONTAL", pad: [3, 10], strokeVar: COLOR_VARS.lineFaded });
+  // ============ CARDS ============
+  if (G.cards) {
+    section("Cards");
+    const card = comp("Card", { gap: 10, pad: [22, 22], fillVar: COLOR_VARS.paperCard, strokeVar: COLOR_VARS.lineFaded });
+    fixW(card, 300);
+    const chip = frame(card, { mode: "HORIZONTAL", pad: [3, 10], strokeVar: COLOR_VARS.lineFaded });
     bindRadius(chip, RADIUS_VARS.pill);
     text(chip, "chip", reg, 11, COLOR_VARS.textMuted);
-    text(c, "Card title", med, 15, COLOR_VARS.ink);
-    text(c, "Supporting line, muted, one sentence long.", reg, 13, COLOR_VARS.textMuted);
-    page.appendChild(c); place(c);
+    text(card, "Card title", med, 15, COLOR_VARS.ink);
+    text(card, "Supporting line, muted, one sentence long.", reg, 13, COLOR_VARS.textMuted);
+    bindRadius(card, RADIUS_VARS.card);
+    place(card);
+    // Stat
+    const stat = comp("Stat", { gap: 6, pad: [22, 22], fillVar: COLOR_VARS.paperCard, strokeVar: COLOR_VARS.lineFaded });
+    fixW(stat, 240);
+    bindRadius(stat, RADIUS_VARS.card);
+    text(stat, "0 000", light, 40, COLOR_VARS.ink);
+    text(stat, "what it counts", reg, 13, COLOR_VARS.textMuted);
+    text(stat, "vs last period", reg, 12, COLOR_VARS.accent);
+    place(stat);
+    // Pricing
+    const pr = comp("Pricing", { gap: 12, pad: [26, 26], fillVar: COLOR_VARS.paperCard, strokeVar: COLOR_VARS.lineFaded });
+    fixW(pr, 300);
+    bindRadius(pr, RADIUS_VARS.sheet);
+    text(pr, "Plan name", med, 13, COLOR_VARS.textMuted);
+    text(pr, "0 000 / mo", light, 32, COLOR_VARS.ink);
+    for (const li of ["First thing included", "Second thing included", "Third thing included"]) {
+      const row = frame(pr, { mode: "HORIZONTAL", gap: 8, calign: "CENTER" });
+      dot(row, 5, COLOR_VARS.accent);
+      text(row, li, reg, 13, COLOR_VARS.ink);
+    }
+    const pcta = frame(pr, { mode: "HORIZONTAL", w: "FILL", align: "CENTER", pad: [10, 0] });
+    pcta.fills = [CTA_GRAD]; pcta.effects = [GRAIN_B];
+    bindRadius(pcta, RADIUS_VARS.pill);
+    text(pcta, "Choose", med, 13, null, WHITE);
+    place(pr);
+    // Quote
+    const qt = comp("Quote", { gap: 10, pad: [22, 22], fillVar: COLOR_VARS.paperInset });
+    fixW(qt, 320);
+    bindRadius(qt, RADIUS_VARS.card);
+    text(qt, "\"A sentence someone actually said, kept short.\"", reg, 14, COLOR_VARS.ink);
+    const qrow = frame(qt, { mode: "HORIZONTAL", gap: 8, calign: "CENTER" });
+    dot(qrow, 5, COLOR_VARS.accent);
+    text(qrow, "Name, role", reg, 12, COLOR_VARS.textMuted);
+    place(qt);
+    endSection();
   }
 
-  if (choices.generate.inputs) {
-    const c = figma.createComponent();
-    c.name = "Input";
-    c.layoutMode = "VERTICAL"; c.itemSpacing = 6;
-    c.resize(280, 60);
-    c.primaryAxisSizingMode = "AUTO"; c.counterAxisSizingMode = "FIXED";
-    text(c, "Label", med, 12, COLOR_VARS.ink);
-    const box = frame(c, { w: "FILL", fillVar: COLOR_VARS.paperCard, strokeVar: COLOR_VARS.lineFaded, pad: [10, 12] });
-    bindRadius(box, RADIUS_VARS.card);
-    text(box, "Placeholder", reg, 13, COLOR_VARS.textMuted);
-    page.appendChild(c); place(c);
-  }
-
-  if (choices.generate.badges) {
-    const c = figma.createComponent();
-    c.name = "Badge";
-    c.layoutMode = "HORIZONTAL"; c.itemSpacing = 6; c.counterAxisAlignItems = "CENTER";
-    c.paddingTop = c.paddingBottom = 4; c.paddingLeft = c.paddingRight = 12;
-    c.fills = [boundSolid(COLOR_VARS.accentSoft)];
-    bindRadius(c, RADIUS_VARS.pill);
-    text(c, "Badge", med, 12, COLOR_VARS.accent);
-    page.appendChild(c); place(c);
-  }
-
-  if (choices.generate.station) {
-    const c = figma.createComponent();
-    c.name = "Station";
-    c.layoutMode = "HORIZONTAL";
-    c.primaryAxisAlignItems = "CENTER"; c.counterAxisAlignItems = "CENTER";
-    c.resize(56, 56);
-    c.primaryAxisSizingMode = "FIXED"; c.counterAxisSizingMode = "FIXED";
-    c.cornerRadius = 999;
-    c.fills = [boundSolid(COLOR_VARS.paperInset)];
-    c.effects = [GRAIN_S];
-    const t = figma.createText();
-    let light = "Light";
-    try { await figma.loadFontAsync({ family, style: "Light" }); } catch (e) { light = reg; }
-    t.fontName = { family, style: light }; t.characters = "01"; t.fontSize = 15;
-    t.fills = [boundSolid(COLOR_VARS.textMuted)];
-    c.appendChild(t);
-    page.appendChild(c); place(c);
-  }
-
-  if (choices.generate.nav) {
-    const c = figma.createComponent();
-    c.name = "Nav";
-    c.layoutMode = "HORIZONTAL";
-    c.primaryAxisAlignItems = "SPACE_BETWEEN"; c.counterAxisAlignItems = "CENTER";
-    c.resize(960, 40);
-    c.primaryAxisSizingMode = "FIXED"; c.counterAxisSizingMode = "AUTO";
-    c.paddingTop = c.paddingBottom = 12;
-    const brand = frame(c, { mode: "HORIZONTAL", gap: 8, calign: "CENTER" });
-    const dot = figma.createRectangle();
-    dot.resize(18, 18);
-    dot.fills = [boundSolid(COLOR_VARS.accent)];
-    brand.appendChild(dot);
-    bindRadius(dot, RADIUS_VARS.card);
+  // ============ NAVIGATION ============
+  if (G.navigation) {
+    section("Navigation");
+    const nav = comp("Nav", { mode: "HORIZONTAL", align: "SPACE_BETWEEN", calign: "CENTER", pad: [12, 0] });
+    nav.resize(960, 40); nav.primaryAxisSizingMode = "FIXED"; nav.counterAxisSizingMode = "AUTO";
+    const brand = frame(nav, { mode: "HORIZONTAL", gap: 8, calign: "CENTER" });
+    const bd = figma.createRectangle();
+    bd.resize(18, 18); bd.fills = [boundSolid(COLOR_VARS.accent)];
+    brand.appendChild(bd);
+    bindRadius(bd, RADIUS_VARS.card);
     text(brand, "yourbrand", semi, 14, COLOR_VARS.ink);
-    const links = frame(c, { mode: "HORIZONTAL", gap: 24, calign: "CENTER" });
+    const links = frame(nav, { mode: "HORIZONTAL", gap: 24, calign: "CENTER" });
     for (const l of ["Product", "Pricing", "About"]) text(links, l, reg, 13, COLOR_VARS.ink);
-    const cta = frame(links, { mode: "HORIZONTAL", pad: [8, 16], calign: "CENTER" });
-    cta.fills = [CTA_GRAD]; cta.effects = [GRAIN_B];
-    bindRadius(cta, RADIUS_VARS.pill);
-    const ct = figma.createText();
-    ct.fontName = { family, style: med }; ct.characters = "Get started"; ct.fontSize = 13;
-    ct.fills = [{ type: "SOLID", color: WHITE }];
-    cta.appendChild(ct);
-    page.appendChild(c); place(c);
+    const ncta = frame(links, { mode: "HORIZONTAL", pad: [8, 16], calign: "CENTER" });
+    ncta.fills = [CTA_GRAD]; ncta.effects = [GRAIN_B];
+    bindRadius(ncta, RADIUS_VARS.pill);
+    text(ncta, "Get started", med, 13, null, WHITE);
+    place(nav);
+    // Tabs
+    const tabs = comp("Tabs", { mode: "HORIZONTAL", gap: 4, pad: [3, 3], fillVar: COLOR_VARS.paperInset });
+    bindRadius(tabs, RADIUS_VARS.pill);
+    ["First", "Second", "Third"].forEach((l, i) => {
+      const t = frame(tabs, { mode: "HORIZONTAL", pad: [6, 16], calign: "CENTER" });
+      if (i === 0) t.fills = [boundSolid(COLOR_VARS.paperCard)];
+      bindRadius(t, RADIUS_VARS.pill);
+      text(t, l, i === 0 ? semi : reg, 12, i === 0 ? COLOR_VARS.ink : COLOR_VARS.textMuted);
+    });
+    place(tabs);
+    // Breadcrumb
+    const bc = comp("Breadcrumb", { mode: "HORIZONTAL", gap: 8, calign: "CENTER" });
+    ["Home", "/", "Section", "/", "Page"].forEach((l, i) => {
+      text(bc, l, reg, 12, (l === "/") ? COLOR_VARS.lineFaded : (i === 4 ? COLOR_VARS.ink : COLOR_VARS.textMuted));
+    });
+    place(bc);
+    // Pagination
+    const pg = comp("Pagination", { mode: "HORIZONTAL", gap: 8, calign: "CENTER" });
+    dot(pg, 8, COLOR_VARS.accent);
+    dot(pg, 8, COLOR_VARS.lineFaded);
+    dot(pg, 8, COLOR_VARS.lineFaded);
+    place(pg);
+    // Footer
+    const ft = comp("Footer", { mode: "HORIZONTAL", align: "SPACE_BETWEEN", pad: [32, 40], fillVar: COLOR_VARS.darkSurface });
+    ft.resize(960, 100); ft.primaryAxisSizingMode = "FIXED"; ft.counterAxisSizingMode = "AUTO";
+    bindRadius(ft, RADIUS_VARS.sheet);
+    const fl = frame(ft, { gap: 10 });
+    const fd = figma.createRectangle();
+    fd.resize(18, 18); fd.fills = [boundSolid(COLOR_VARS.accent)];
+    fl.appendChild(fd);
+    bindRadius(fd, RADIUS_VARS.card);
+    text(fl, "One line about the brand.", reg, 12, COLOR_VARS.darkTextMuted);
+    const fc = frame(ft, { mode: "HORIZONTAL", gap: 48 });
+    for (const colName of ["Product", "Resources", "Contact"]) {
+      const col = frame(fc, { gap: 8 });
+      text(col, colName, med, 12, COLOR_VARS.darkText);
+      text(col, "Link one", reg, 12, COLOR_VARS.darkTextMuted);
+      text(col, "Link two", reg, 12, COLOR_VARS.darkTextMuted);
+    }
+    place(ft);
+    endSection();
+  }
+
+  // ============ OVERLAYS ============
+  if (G.overlays) {
+    section("Overlays");
+    const modal = comp("Modal", { gap: 12, pad: [26, 26] });
+    fixW(modal, 380);
+    modal.fills = [figma.variables.setBoundVariableForPaint({ type: "SOLID", color: val(COLOR_VARS.paper), opacity: 0.92 }, "color", V(COLOR_VARS.paper))];
+    modal.strokes = [{ type: "SOLID", color: WHITE }]; modal.strokeWeight = 1;
+    modal.effects = [{ type: "BACKGROUND_BLUR", radius: choices.blur || 34, visible: true }, GRAIN_S,
+      { type: "DROP_SHADOW", color: { r: 0.05, g: 0.05, b: 0.05, a: 0.25 }, offset: { x: 0, y: 20 }, radius: 50, spread: -12, visible: true, blendMode: "NORMAL" }];
+    bindRadius(modal, RADIUS_VARS.sheet);
+    text(modal, "Modal title", semi, 18, COLOR_VARS.ink);
+    text(modal, "One sentence that explains the choice.", reg, 13, COLOR_VARS.textMuted);
+    const mrow = frame(modal, { mode: "HORIZONTAL", w: "FILL", align: "SPACE_BETWEEN", calign: "CENTER", pad: [6, 0] });
+    text(mrow, "Cancel", reg, 13, COLOR_VARS.textMuted);
+    const mcta = frame(mrow, { mode: "HORIZONTAL", pad: [9, 18], calign: "CENTER" });
+    mcta.fills = [CTA_GRAD]; mcta.effects = [GRAIN_B];
+    bindRadius(mcta, RADIUS_VARS.pill);
+    text(mcta, "Confirm", med, 13, null, WHITE);
+    place(modal);
+    // Tooltip
+    const tip = comp("Tooltip", { mode: "HORIZONTAL", pad: [6, 10], fillVar: COLOR_VARS.darkSurface });
+    bindRadius(tip, RADIUS_VARS.card);
+    text(tip, "A short helpful hint", reg, 11, COLOR_VARS.darkText);
+    place(tip);
+    // Alert
+    const al = comp("Alert", { mode: "HORIZONTAL", gap: 10, pad: [12, 16], calign: "CENTER", fillVar: COLOR_VARS.paperInset, strokeVar: COLOR_VARS.lineFaded });
+    fixW(al, 380);
+    al.layoutMode = "HORIZONTAL";
+    bindRadius(al, RADIUS_VARS.card);
+    dot(al, 7, COLOR_VARS.accent);
+    text(al, "Something worth knowing, said once.", reg, 13, COLOR_VARS.ink);
+    place(al);
+    endSection();
+  }
+
+  // ============ DATA ============
+  if (G.data) {
+    section("Data");
+    const table = comp("Table", { gap: 0, fillVar: COLOR_VARS.paperCard, strokeVar: COLOR_VARS.lineFaded });
+    fixW(table, 640);
+    bindRadius(table, RADIUS_VARS.card);
+    table.clipsContent = true;
+    const trow = (cells, head) => {
+      const r = frame(table, { mode: "HORIZONTAL", w: "FILL", pad: [10, 16], calign: "CENTER" });
+      if (head) r.fills = [boundSolid(COLOR_VARS.paperInset)];
+      cells.forEach((cell, i) => {
+        const cellF = frame(r, { mode: "HORIZONTAL" });
+        cellF.layoutSizingHorizontal = "FILL";
+        text(cellF, cell, head ? med : reg, 12, head ? COLOR_VARS.ink : (i === 0 ? COLOR_VARS.ink : COLOR_VARS.textMuted));
+      });
+      if (!head) {
+        const hl = figma.createRectangle();
+        hl.resize(10, 1);
+        hl.fills = [boundSolid(COLOR_VARS.lineFaded)];
+        table.insertChild(table.children.length - 1, hl);
+        hl.layoutSizingHorizontal = "FILL";
+      }
+    };
+    trow(["Name", "Value", "Change"], true);
+    trow(["First row", "0 000", "+0 %"], false);
+    trow(["Second row", "0 000", "+0 %"], false);
+    trow(["Third row", "0 000", "+0 %"], false);
+    place(table);
+    endSection();
+  }
+
+  // ============ DIAGRAM ============
+  if (G.diagram) {
+    section("Diagram");
+    // Station disc
+    const st = comp("Station", { mode: "HORIZONTAL", align: "CENTER", calign: "CENTER" });
+    st.resize(56, 56); st.primaryAxisSizingMode = "FIXED"; st.counterAxisSizingMode = "FIXED";
+    st.cornerRadius = 999;
+    st.fills = [boundSolid(COLOR_VARS.paperInset)];
+    st.effects = [GRAIN_S];
+    text(st, "01", light, 15, COLOR_VARS.textMuted);
+    place(st);
+    // Stepper: 3 discs on a rail, terminal dot
+    const sp = comp("Stepper", { mode: "HORIZONTAL", gap: 0, calign: "CENTER" });
+    const seg = () => {
+      const l = figma.createRectangle();
+      l.resize(90, 1);
+      l.fills = [boundSolid(COLOR_VARS.lineFaded)];
+      sp.appendChild(l);
+    };
+    const discN = (n, on) => {
+      const d = frame(sp, { mode: "HORIZONTAL", align: "CENTER", calign: "CENTER" });
+      d.resize(44, 44); d.primaryAxisSizingMode = "FIXED"; d.counterAxisSizingMode = "FIXED";
+      d.cornerRadius = 999;
+      d.fills = [boundSolid(on ? COLOR_VARS.accentSoft : COLOR_VARS.paperInset)];
+      d.effects = [GRAIN_S];
+      text(d, n, light, 13, on ? COLOR_VARS.accent : COLOR_VARS.textMuted);
+    };
+    discN("01", true); seg(); discN("02", false); seg(); discN("03", false); seg();
+    dot(sp, 7, COLOR_VARS.accent);
+    place(sp);
+    // Legend
+    const lg = comp("Legend", { mode: "HORIZONTAL", gap: 8, calign: "CENTER", pad: [6, 12], fillVar: COLOR_VARS.paperCard });
+    bindRadius(lg, RADIUS_VARS.pill);
+    dot(lg, 6, COLOR_VARS.accent);
+    text(lg, "the signal", reg, 12, COLOR_VARS.accent);
+    place(lg);
+    endSection();
   }
 
   // Take the user by the hand: jump straight to what was just created.
