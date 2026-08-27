@@ -37,10 +37,51 @@
 <div class="sub">Pick a scope, check what applies, exclusions are respected.</div>
 
 <div class="setup" id="setup">
-  <p>This file has no "Brand" variable collection yet. Initialize it to start
-  from zero: every token gets created, with the defaults below or with a
-  pasted tokens.json.</p>
-  <button class="primary" id="bootstrap">Initialize brand kit</button>
+  <p>This file has no brand kit yet. The wizard asks three questions and
+  generates the variables plus a starter set of components, all bound: move a
+  token later, everything follows.</p>
+  <button class="primary" id="wizard-open">Run the setup wizard</button>
+  <div class="btnrow"><button class="mini" id="bootstrap">Variables only, no components</button></div>
+</div>
+
+<div class="setup" id="wizard" style="display:none">
+  <div id="wz-1">
+    <p><b>1 / 3, the basics.</b> The accent is the one color that points.</p>
+    <div class="row"><label>Accent</label><input type="color" id="wz-accent" value="#2B47E8"></div>
+    <div class="row"><label>Paper (light ground)</label><input type="color" id="wz-paper" value="#F7F5F2"></div>
+    <div class="row"><label>Dark surface</label><input type="color" id="wz-dark" value="#161615"></div>
+    <div class="row"><label>Typeface</label>
+      <select id="wz-font" style="width:150px">
+        <option>Archivo</option><option>Inter</option><option>Space Grotesk</option>
+        <option>Lora</option><option>DM Sans</option>
+      </select>
+    </div>
+    <div class="btnrow"><button class="primary" id="wz-next-1">Next</button></div>
+  </div>
+  <div id="wz-2" style="display:none">
+    <p><b>2 / 3, the shape.</b> Radii and materials, adjustable forever after.</p>
+    <div class="radios">
+      <label><input type="radio" name="wz-shape" value="sharp"> Sharp (0)</label>
+      <label><input type="radio" name="wz-shape" value="soft" checked> Soft (12 / 18)</label>
+      <label><input type="radio" name="wz-shape" value="round"> Round (20 / 26)</label>
+    </div>
+    <div class="row"><label>Grain</label><input type="range" id="wz-grain" min="0" max="20" value="5"><span class="val" id="wz-grain-v">5</span></div>
+    <div class="row"><label>Frosted glass (blur)</label><input type="range" id="wz-blur" min="0" max="80" value="34"><span class="val" id="wz-blur-v">34</span></div>
+    <div class="btnrow"><button class="ghost" id="wz-back-2">Back</button><button class="primary" id="wz-next-2">Next</button></div>
+  </div>
+  <div id="wz-3" style="display:none">
+    <p><b>3 / 3, the starter components.</b> Generated on a "Brand Kit" page,
+    every one bound to the variables.</p>
+    <div class="checks">
+      <label><input type="checkbox" id="wz-buttons" checked> Buttons</label>
+      <label><input type="checkbox" id="wz-cards" checked> Card</label>
+      <label><input type="checkbox" id="wz-inputs" checked> Input</label>
+      <label><input type="checkbox" id="wz-badges" checked> Badge</label>
+      <label><input type="checkbox" id="wz-station" checked> Diagram disc</label>
+      <label><input type="checkbox" id="wz-nav" checked> Nav bar</label>
+    </div>
+    <div class="btnrow"><button class="ghost" id="wz-back-3">Back</button><button class="primary" id="wz-generate">Generate the kit</button></div>
+  </div>
 </div>
 
 <h2>Kit</h2>
@@ -52,6 +93,7 @@
     <input type="text" id="kit-name" placeholder="kit name">
     <button class="mini" id="kit-save">Save</button>
     <button class="mini" id="kit-delete">Delete</button>
+    <button class="mini" id="wizard-open-2">Wizard</button>
   </div>
   <details style="margin-top:6px">
     <summary>Import / paste a tokens.json</summary>
@@ -110,6 +152,9 @@
 <div class="btnrow" style="margin-top:14px">
   <button class="ghost" id="analyze">Analyze</button>
   <button class="primary" id="apply">Apply</button>
+</div>
+<div class="checks" style="margin-top:6px">
+  <label><input type="checkbox" id="live"> Live mode: colors and radii apply the instant a control moves (gradients and grain still need Apply)</label>
 </div>
 <div class="report" id="report"></div>
 <div class="btnrow">
@@ -189,6 +234,65 @@
     try { payload = JSON.parse(document.getElementById("kit-json").value); } catch (e) {}
     post({ type: "bootstrap", payload });
   });
+
+  // ----- wizard
+  const wzShow = (n) => {
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("wizard").style.display = "block";
+    for (const i of [1, 2, 3]) document.getElementById("wz-" + i).style.display = i === n ? "block" : "none";
+  };
+  document.getElementById("wizard-open").addEventListener("click", () => wzShow(1));
+  document.getElementById("wizard-open-2").addEventListener("click", () => wzShow(1));
+  document.getElementById("wz-next-1").addEventListener("click", () => wzShow(2));
+  document.getElementById("wz-back-2").addEventListener("click", () => wzShow(1));
+  document.getElementById("wz-next-2").addEventListener("click", () => wzShow(3));
+  document.getElementById("wz-back-3").addEventListener("click", () => wzShow(2));
+  for (const id of ["grain", "blur"]) {
+    const inp = document.getElementById("wz-" + id);
+    inp.addEventListener("input", () => document.getElementById("wz-" + id + "-v").textContent = inp.value);
+  }
+  document.getElementById("wz-generate").addEventListener("click", () => {
+    const shape = document.querySelector('input[name="wz-shape"]:checked').value;
+    const radii = shape === "sharp" ? { pill: 999, card: 2, sheet: 4 }
+      : shape === "round" ? { pill: 999, card: 20, sheet: 26 }
+      : { pill: 999, card: 12, sheet: 18 };
+    const g = Number(document.getElementById("wz-grain").value);
+    const payload = {
+      colors: {
+        accent: document.getElementById("wz-accent").value,
+        paper: document.getElementById("wz-paper").value,
+        darkSurface: document.getElementById("wz-dark").value
+      },
+      radii,
+      grain: { light: g, strong: Math.min(30, Math.round(g * 2.4)), density: 0.5 },
+      blur: Number(document.getElementById("wz-blur").value),
+      font: document.getElementById("wz-font").value,
+      generate: {
+        buttons: document.getElementById("wz-buttons").checked,
+        cards: document.getElementById("wz-cards").checked,
+        inputs: document.getElementById("wz-inputs").checked,
+        badges: document.getElementById("wz-badges").checked,
+        station: document.getElementById("wz-station").checked,
+        nav: document.getElementById("wz-nav").checked
+      }
+    };
+    document.getElementById("wz-generate").disabled = true;
+    document.getElementById("wz-generate").textContent = "Generating";
+    post({ type: "wizard-generate", payload });
+  });
+
+  // ----- live mode
+  const liveOn = () => document.getElementById("live").checked;
+  for (const [key] of COLORS) {
+    document.getElementById("c-" + key).addEventListener("input", (e) => {
+      if (liveOn()) post({ type: "live", key, value: e.target.value });
+    });
+  }
+  for (const [key] of RADII) {
+    document.getElementById("r-" + key).addEventListener("input", (e) => {
+      if (liveOn()) post({ type: "live", key, value: Number(e.target.value) });
+    });
+  }
   document.getElementById("analyze").addEventListener("click", () => post({ type: "analyze", payload: collect() }));
   applyBtn.addEventListener("click", () => {
     applyBtn.disabled = true; applyBtn.textContent = "Working";
@@ -229,8 +333,15 @@
   onmessage = (e) => {
     const m = e.data.pluginMessage;
     if (!m) return;
+    if (m.type === "wizard-done") {
+      document.getElementById("wizard").style.display = "none";
+      document.getElementById("wz-generate").disabled = false;
+      document.getElementById("wz-generate").textContent = "Generate the kit";
+      if (m.error) document.getElementById("err").textContent = m.error;
+    }
     if (m.type === "state") {
-      document.getElementById("setup").style.display = m.state.missing ? "block" : "none";
+      if (document.getElementById("wizard").style.display !== "block")
+        document.getElementById("setup").style.display = m.state.missing ? "block" : "none";
       fill(m.state.missing ? m.state.defaults : m.state);
       const list = document.getElementById("kit-list");
       const cur = list.value;

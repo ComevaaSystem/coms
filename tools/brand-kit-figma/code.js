@@ -333,6 +333,208 @@ function buildCss(p) {
   ].join("\n");
 }
 
+// ---------- live mode: one variable written the instant a control moves
+async function liveSet(key, value) {
+  const vm = await getVarMap();
+  if (!vm) return;
+  if (COLOR_VARS[key]) {
+    const c = hex2rgb(value);
+    const v = vm.byName[COLOR_VARS[key]];
+    if (v && c) {
+      v.setValueForMode(vm.mode, c);
+      if (key === "accent") {
+        const soft = vm.byName[COLOR_VARS.accentSoft];
+        if (soft) soft.setValueForMode(vm.mode, mix(c, WHITE, 0.78));
+      }
+    }
+  } else if (RADIUS_VARS[key]) {
+    const v = vm.byName[RADIUS_VARS[key]];
+    if (v && typeof value === "number") v.setValueForMode(vm.mode, value);
+  }
+}
+
+// ---------- starter components (the wizard's Generate step)
+// Everything is BOUND to the variables, so moving a token later moves every
+// generated component instantly. Gradients and grain follow on Apply.
+async function generateStarter(choices) {
+  const vm = await getVarMap();
+  if (!vm) return { error: "Initialize the brand kit first." };
+  const V = (name) => vm.byName[name];
+  const val = (name) => V(name) ? V(name).valuesByMode[vm.mode] : { r: 0, g: 0, b: 0 };
+  const boundSolid = (name) => figma.variables.setBoundVariableForPaint(
+    { type: "SOLID", color: val(name) }, "color", V(name));
+  const bindRadius = (node, name) => {
+    try {
+      node.cornerRadius = val(name);
+      for (const c of ["topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"])
+        node.setBoundVariable(c, V(name));
+    } catch (e) {}
+  };
+  const GRAIN_S = { type: "NOISE", noiseSize: 1, noiseType: "MONOTONE", color: { r: 0, g: 0, b: 0, a: (choices.grain.light || 5) / 100 }, density: choices.grain.density || 0.5, visible: true };
+  const GRAIN_B = { type: "NOISE", noiseSize: 1, noiseType: "MONOTONE", color: { r: 0, g: 0, b: 0, a: (choices.grain.strong || 12) / 100 }, density: choices.grain.density || 0.5, visible: true };
+  const accent = val(COLOR_VARS.accent);
+  const CTA_GRAD = { type: "GRADIENT_LINEAR", gradientTransform: [[1, 0, 0], [0, 1, 0]],
+    gradientStops: [
+      { position: 0, color: Object.assign({}, mix(accent, WHITE, 0.18), { a: 1 }) },
+      { position: 1, color: Object.assign({}, mix(accent, BLACK, 0.30), { a: 1 }) }
+    ] };
+
+  const family = choices.font || "Archivo";
+  const F = { r: family, m: family, sb: family };
+  const load = async (style) => { await figma.loadFontAsync({ family, style }); return style; };
+  let reg = "Regular", med = "Medium", semi = "SemiBold";
+  try { await load("Regular"); } catch (e) { return { error: "Font \"" + family + "\" is not available in Figma." }; }
+  try { await load("Medium"); } catch (e) { med = "Regular"; }
+  try { await load("SemiBold"); } catch (e) { semi = med; }
+
+  const text = (p, chars, style, size, colorVar) => {
+    const t = figma.createText();
+    t.fontName = { family, style };
+    t.characters = chars;
+    t.fontSize = size;
+    t.fills = [boundSolid(colorVar)];
+    p.appendChild(t);
+    return t;
+  };
+  const frame = (p, o) => {
+    const f = figma.createFrame();
+    f.layoutMode = o.mode || "VERTICAL";
+    f.itemSpacing = o.gap == null ? 10 : o.gap;
+    f.fills = o.fillVar ? [boundSolid(o.fillVar)] : [];
+    if (o.strokeVar) { f.strokes = [boundSolid(o.strokeVar)]; f.strokeWeight = 1; }
+    p.appendChild(f);
+    if (p.layoutMode && p.layoutMode !== "NONE") {
+      f.layoutSizingHorizontal = o.w || "HUG";
+      f.layoutSizingVertical = o.h || "HUG";
+    }
+    if (o.pad) { f.paddingTop = f.paddingBottom = o.pad[0]; f.paddingLeft = f.paddingRight = o.pad[1]; }
+    if (o.align) f.primaryAxisAlignItems = o.align;
+    if (o.calign) f.counterAxisAlignItems = o.calign;
+    return f;
+  };
+
+  // dedicated page
+  let page = figma.root.children.find((p) => p.name === "Brand Kit");
+  if (!page) { page = figma.createPage(); page.name = "Brand Kit"; }
+  await figma.setCurrentPageAsync(page);
+  let x = 0;
+  const made = [];
+  const place = (comp) => { comp.x = x; comp.y = 0; x += comp.width + 80; made.push(comp.name); };
+
+  if (choices.generate.buttons) {
+    const mk = (variantName, primary) => {
+      const c = figma.createComponent();
+      c.name = variantName;
+      c.layoutMode = "HORIZONTAL";
+      c.counterAxisAlignItems = "CENTER";
+      c.paddingTop = c.paddingBottom = 10; c.paddingLeft = c.paddingRight = 20;
+      if (primary) { c.fills = [CTA_GRAD]; c.effects = [GRAIN_B]; }
+      else { c.fills = []; c.strokes = [boundSolid(COLOR_VARS.lineFaded)]; c.strokeWeight = 1; }
+      bindRadius(c, RADIUS_VARS.pill);
+      const t = figma.createText();
+      t.fontName = { family, style: med }; t.characters = "Button"; t.fontSize = 13;
+      t.fills = primary ? [{ type: "SOLID", color: WHITE }] : [boundSolid(COLOR_VARS.ink)];
+      c.appendChild(t);
+      return c;
+    };
+    const set = figma.combineAsVariants([mk("kind=primary", true), mk("kind=secondary", false)], page);
+    set.name = "Button";
+    set.layoutMode = "HORIZONTAL"; set.itemSpacing = 24;
+    set.paddingTop = set.paddingBottom = set.paddingLeft = set.paddingRight = 24;
+    place(set);
+  }
+
+  if (choices.generate.cards) {
+    const c = figma.createComponent();
+    c.name = "Card";
+    c.layoutMode = "VERTICAL"; c.itemSpacing = 10;
+    c.resize(300, 100);
+    c.primaryAxisSizingMode = "AUTO"; c.counterAxisSizingMode = "FIXED";
+    c.paddingTop = c.paddingBottom = 22; c.paddingLeft = c.paddingRight = 22;
+    c.fills = [boundSolid(COLOR_VARS.paperCard)];
+    c.strokes = [boundSolid(COLOR_VARS.lineFaded)]; c.strokeWeight = 1;
+    bindRadius(c, RADIUS_VARS.card);
+    const chip = frame(c, { mode: "HORIZONTAL", pad: [3, 10], strokeVar: COLOR_VARS.lineFaded });
+    bindRadius(chip, RADIUS_VARS.pill);
+    text(chip, "chip", reg, 11, COLOR_VARS.textMuted);
+    text(c, "Card title", med, 15, COLOR_VARS.ink);
+    text(c, "Supporting line, muted, one sentence long.", reg, 13, COLOR_VARS.textMuted);
+    page.appendChild(c); place(c);
+  }
+
+  if (choices.generate.inputs) {
+    const c = figma.createComponent();
+    c.name = "Input";
+    c.layoutMode = "VERTICAL"; c.itemSpacing = 6;
+    c.resize(280, 60);
+    c.primaryAxisSizingMode = "AUTO"; c.counterAxisSizingMode = "FIXED";
+    text(c, "Label", med, 12, COLOR_VARS.ink);
+    const box = frame(c, { w: "FILL", fillVar: COLOR_VARS.paperCard, strokeVar: COLOR_VARS.lineFaded, pad: [10, 12] });
+    bindRadius(box, RADIUS_VARS.card);
+    text(box, "Placeholder", reg, 13, COLOR_VARS.textMuted);
+    page.appendChild(c); place(c);
+  }
+
+  if (choices.generate.badges) {
+    const c = figma.createComponent();
+    c.name = "Badge";
+    c.layoutMode = "HORIZONTAL"; c.itemSpacing = 6; c.counterAxisAlignItems = "CENTER";
+    c.paddingTop = c.paddingBottom = 4; c.paddingLeft = c.paddingRight = 12;
+    c.fills = [boundSolid(COLOR_VARS.accentSoft)];
+    bindRadius(c, RADIUS_VARS.pill);
+    text(c, "Badge", med, 12, COLOR_VARS.accent);
+    page.appendChild(c); place(c);
+  }
+
+  if (choices.generate.station) {
+    const c = figma.createComponent();
+    c.name = "Station";
+    c.layoutMode = "HORIZONTAL";
+    c.primaryAxisAlignItems = "CENTER"; c.counterAxisAlignItems = "CENTER";
+    c.resize(56, 56);
+    c.primaryAxisSizingMode = "FIXED"; c.counterAxisSizingMode = "FIXED";
+    c.cornerRadius = 999;
+    c.fills = [boundSolid(COLOR_VARS.paperInset)];
+    c.effects = [GRAIN_S];
+    const t = figma.createText();
+    let light = "Light";
+    try { await figma.loadFontAsync({ family, style: "Light" }); } catch (e) { light = reg; }
+    t.fontName = { family, style: light }; t.characters = "01"; t.fontSize = 15;
+    t.fills = [boundSolid(COLOR_VARS.textMuted)];
+    c.appendChild(t);
+    page.appendChild(c); place(c);
+  }
+
+  if (choices.generate.nav) {
+    const c = figma.createComponent();
+    c.name = "Nav";
+    c.layoutMode = "HORIZONTAL";
+    c.primaryAxisAlignItems = "SPACE_BETWEEN"; c.counterAxisAlignItems = "CENTER";
+    c.resize(960, 40);
+    c.primaryAxisSizingMode = "FIXED"; c.counterAxisSizingMode = "AUTO";
+    c.paddingTop = c.paddingBottom = 12;
+    const brand = frame(c, { mode: "HORIZONTAL", gap: 8, calign: "CENTER" });
+    const dot = figma.createRectangle();
+    dot.resize(18, 18);
+    dot.fills = [boundSolid(COLOR_VARS.accent)];
+    brand.appendChild(dot);
+    bindRadius(dot, RADIUS_VARS.card);
+    text(brand, "yourbrand", semi, 14, COLOR_VARS.ink);
+    const links = frame(c, { mode: "HORIZONTAL", gap: 24, calign: "CENTER" });
+    for (const l of ["Product", "Pricing", "About"]) text(links, l, reg, 13, COLOR_VARS.ink);
+    const cta = frame(links, { mode: "HORIZONTAL", pad: [8, 16], calign: "CENTER" });
+    cta.fills = [CTA_GRAD]; cta.effects = [GRAIN_B];
+    bindRadius(cta, RADIUS_VARS.pill);
+    const ct = figma.createText();
+    ct.fontName = { family, style: med }; ct.characters = "Get started"; ct.fontSize = 13;
+    ct.fills = [{ type: "SOLID", color: WHITE }];
+    cta.appendChild(ct);
+    page.appendChild(c); place(c);
+  }
+
+  return { made };
+}
+
 // ---------- message loop
 figma.showUI(__html__, { width: 360, height: 780, themeColors: true });
 
@@ -353,6 +555,15 @@ figma.ui.onmessage = async (msg) => {
       const r = await bootstrap(msg.payload);
       figma.notify("Brand kit initialized: " + r.created + " variable(s) created");
       figma.ui.postMessage({ type: "state", state: await readState() });
+    } else if (msg.type === "live") {
+      await liveSet(msg.key, msg.value);
+    } else if (msg.type === "wizard-generate") {
+      await bootstrap(msg.payload);
+      const r = await generateStarter(msg.payload);
+      if (r.error) figma.notify(r.error, { error: true });
+      else figma.notify("Starter kit generated: " + r.made.join(", "));
+      figma.ui.postMessage({ type: "state", state: await readState() });
+      figma.ui.postMessage({ type: "wizard-done", made: r.made || [], error: r.error });
     } else if (msg.type === "analyze") {
       const st = await run(msg.payload, true);
       figma.ui.postMessage({ type: "analysis", st });
