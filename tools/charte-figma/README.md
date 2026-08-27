@@ -11,6 +11,24 @@ degrades des CTA et des capsules, les grains, le verre depoli.
 3. Choisir `manifest.json` dans ce dossier
 4. Le plugin apparait dans Plugins > Development > **Charte Comevaa**
 
+## Ce que la version pro ajoute
+
+- **Portee** : selection, page courante, ou tout le fichier. Plus jamais
+  "partout" par accident.
+- **Categories a cocher** : couleurs, radius, degrades, grains, verre,
+  rebranchement. Ce qui n'est pas coche n'est pas touche.
+- **Hors charte** : sortir une selection de la charte la detache des variables
+  et la fait ignorer par tous les balayages. C'est la soupape contre le
+  "tout pareil partout" : une piece libre reste libre.
+- **Analyser** : le meme balayage sans rien ecrire, qui dit combien d'elements
+  seraient touches, avant de cliquer Appliquer.
+- **Chartes nommees** : enregistrees dans le fichier, rechargeables,
+  supprimables, importables en JSON. Un fichier peut porter la charte de
+  chaque client de l'offre Marque.
+- **Rebrancher** : les couleurs proches d'un token qui ne sont pas encore
+  branchees sur une variable le deviennent (utile apres une reinclusion ou
+  sur un fichier repris a la main).
+
 ## Usage
 
 - Ouvrir le fichier "Comevaa, Directions site", lancer le plugin

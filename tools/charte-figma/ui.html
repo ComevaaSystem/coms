@@ -1,80 +1,123 @@
 <style>
   * { box-sizing: border-box; margin: 0; font-family: "Archivo", -apple-system, "Segoe UI", sans-serif; }
-  body { background: #F7F5F2; color: #141414; padding: 16px; font-size: 12px; }
-  h1 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-  .sub { color: #6B6A66; margin-bottom: 14px; }
-  h2 { font-size: 11px; font-weight: 600; margin: 16px 0 8px; color: #141414; }
-  .card { background: #FCFBF9; border: 1px solid #B9B5AB; border-radius: 10px; padding: 10px 12px; }
-  .row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; gap: 8px; }
+  body { background: #F7F5F2; color: #141414; padding: 14px 16px; font-size: 12px; }
+  h1 { font-size: 14px; font-weight: 600; }
+  .sub { color: #6B6A66; margin: 2px 0 12px; }
+  h2 { font-size: 11px; font-weight: 600; margin: 14px 0 6px; }
+  .card { background: #FCFBF9; border: 1px solid #B9B5AB; border-radius: 10px; padding: 8px 12px; }
+  .row { display: flex; align-items: center; justify-content: space-between; padding: 3px 0; gap: 8px; }
   .row label { color: #3f3e3b; flex: 1; }
-  input[type="color"] { width: 44px; height: 24px; border: 1px solid #B9B5AB; border-radius: 6px; padding: 0 2px; background: #fff; }
-  input[type="number"] { width: 58px; border: 1px solid #B9B5AB; border-radius: 6px; padding: 4px 6px; font-size: 12px; background: #fff; }
+  input[type="color"] { width: 42px; height: 22px; border: 1px solid #B9B5AB; border-radius: 6px; padding: 0 2px; background: #fff; }
+  input[type="number"] { width: 56px; border: 1px solid #B9B5AB; border-radius: 6px; padding: 3px 6px; font-size: 12px; background: #fff; }
   input[type="range"] { flex: 1; accent-color: #2B47E8; }
-  .val { width: 34px; text-align: right; color: #6B6A66; font-variant-numeric: tabular-nums; }
-  .presets { display: flex; gap: 6px; margin-bottom: 4px; }
-  .presets button { flex: 1; border: 1px solid #B9B5AB; background: #FCFBF9; border-radius: 999px; padding: 6px 0; font-size: 11px; cursor: pointer; }
-  .presets button:hover { border-color: #2B47E8; color: #2B47E8; }
-  .actions { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
-  .primary { background: #2B47E8; color: #fff; border: 0; border-radius: 999px; padding: 10px 0; font-size: 13px; font-weight: 500; cursor: pointer; width: 100%; }
+  input[type="text"], select, textarea { border: 1px solid #B9B5AB; border-radius: 6px; padding: 5px 8px; font-size: 12px; background: #fff; width: 100%; }
+  textarea { font-family: ui-monospace, monospace; font-size: 10px; height: 90px; }
+  .val { width: 30px; text-align: right; color: #6B6A66; font-variant-numeric: tabular-nums; }
+  .radios, .checks { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .radios label, .checks label { display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 3px 0; }
+  input[type="radio"], input[type="checkbox"] { accent-color: #2B47E8; }
+  .btnrow { display: flex; gap: 6px; margin-top: 6px; }
+  button { cursor: pointer; font-size: 12px; }
+  .primary { background: #2B47E8; color: #fff; border: 0; border-radius: 999px; padding: 9px 0; font-weight: 500; flex: 1; }
   .primary:disabled { opacity: 0.5; }
-  .ghost { background: transparent; border: 1px solid #B9B5AB; border-radius: 999px; padding: 8px 0; font-size: 12px; cursor: pointer; width: 100%; color: #141414; }
-  .note { color: #6B6A66; margin-top: 10px; line-height: 1.5; }
-  .err { color: #b02020; margin-top: 10px; }
+  .ghost { background: transparent; border: 1px solid #B9B5AB; border-radius: 999px; padding: 7px 10px; color: #141414; flex: 1; }
+  .ghost:hover { border-color: #2B47E8; color: #2B47E8; }
+  .mini { border: 1px solid #B9B5AB; background: #FCFBF9; border-radius: 6px; padding: 4px 8px; font-size: 11px; }
+  .report { background: #EDF0FF; border: 1px solid #2B47E8; border-radius: 8px; padding: 8px 10px; color: #1b2fb4; margin-top: 8px; display: none; line-height: 1.5; }
+  .note { color: #6B6A66; margin-top: 8px; line-height: 1.45; }
+  .err { color: #b02020; margin-top: 8px; }
+  .selinfo { color: #6B6A66; font-size: 11px; }
   a.dl { display: none; }
+  details summary { cursor: pointer; font-size: 11px; font-weight: 600; padding: 4px 0; }
 </style>
 
 <h1>Charte Comevaa</h1>
-<div class="sub">Un geste, tout le fichier suit : variables, degrades, grains.</div>
+<div class="sub">Portee choisie, categories cochees, exclusions respectees.</div>
 
-<div class="presets">
-  <button data-preset="edito">Edito</button>
-  <button data-preset="maison">Maison</button>
-  <button data-preset="orbit">Orbit</button>
+<h2>Charte</h2>
+<div class="card">
+  <div class="row">
+    <select id="charte-list"><option value="">Charte courante du fichier</option></select>
+  </div>
+  <div class="btnrow">
+    <input type="text" id="charte-nom" placeholder="nom de la charte">
+    <button class="mini" id="charte-save">Enregistrer</button>
+    <button class="mini" id="charte-delete">Supprimer</button>
+  </div>
+  <details style="margin-top:6px">
+    <summary>Importer / coller un tokens.json</summary>
+    <textarea id="charte-json" placeholder='{"couleurs":{"accent":"#2B47E8", ...}}'></textarea>
+    <div class="btnrow"><button class="mini" id="charte-import">Charger dans le panneau</button></div>
+  </details>
+</div>
+
+<h2>Portee</h2>
+<div class="card">
+  <div class="radios">
+    <label><input type="radio" name="scope" value="selection"> Selection <span class="selinfo" id="selinfo"></span></label>
+    <label><input type="radio" name="scope" value="page"> Page courante</label>
+    <label><input type="radio" name="scope" value="file" checked> Tout le fichier</label>
+  </div>
+  <div class="note">Couleurs et radius passent par les variables, globales par nature. La portee gouverne degrades, grains, verre et rebranchement.</div>
+</div>
+
+<h2>Quoi appliquer</h2>
+<div class="card">
+  <div class="checks">
+    <label><input type="checkbox" id="ap-couleurs" checked> Couleurs</label>
+    <label><input type="checkbox" id="ap-radius" checked> Radius</label>
+    <label><input type="checkbox" id="ap-degrades" checked> Degrades</label>
+    <label><input type="checkbox" id="ap-grains" checked> Grains</label>
+    <label><input type="checkbox" id="ap-verre" checked> Verre depoli</label>
+    <label><input type="checkbox" id="ap-rebrancher"> Rebrancher les couleurs proches</label>
+  </div>
+</div>
+
+<h2>Hors charte</h2>
+<div class="card">
+  <div class="btnrow">
+    <button class="ghost" id="exclude">Sortir la selection</button>
+    <button class="ghost" id="include">Reinclure</button>
+  </div>
+  <div class="note">Un element sorti est detache des variables et ignore par tout : c'est la soupape contre le "tout pareil partout".</div>
 </div>
 
 <h2>L'accent</h2>
 <div class="card" id="accent-box"></div>
-
 <h2>Gamme claire</h2>
 <div class="card" id="light-box"></div>
-
 <h2>Gamme sombre</h2>
 <div class="card" id="dark-box"></div>
-
 <h2>Radius</h2>
 <div class="card" id="radius-box"></div>
-
 <h2>Matieres</h2>
 <div class="card" id="mat-box">
   <div class="row"><label>Grain leger (papier, disques)</label><input type="range" id="g-leger" min="0" max="20" value="5"><span class="val" id="v-leger">5</span></div>
   <div class="row"><label>Grain fort (capsules, CTA)</label><input type="range" id="g-fort" min="0" max="30" value="12"><span class="val" id="v-fort">12</span></div>
-  <div class="row"><label>Densite du grain</label><input type="range" id="g-dens" min="10" max="100" value="50"><span class="val" id="v-dens">50</span></div>
+  <div class="row"><label>Densite</label><input type="range" id="g-dens" min="10" max="100" value="50"><span class="val" id="v-dens">50</span></div>
   <div class="row"><label>Verre depoli (blur)</label><input type="range" id="g-blur" min="0" max="80" value="34"><span class="val" id="v-blur">34</span></div>
 </div>
 
-<div class="actions">
-  <button class="primary" id="apply">Appliquer a tout le fichier</button>
+<div class="btnrow" style="margin-top:14px">
+  <button class="ghost" id="analyze">Analyser</button>
+  <button class="primary" id="apply">Appliquer</button>
+</div>
+<div class="report" id="report"></div>
+<div class="btnrow">
   <button class="ghost" id="export">Exporter tokens.json + CSS</button>
 </div>
-<div class="note">L'accent pale et les degrades se recalculent depuis l'accent : ils ne se reglent pas a la main. Le meme tokens.json alimente le site.</div>
 <div class="err" id="err"></div>
 <a class="dl" id="dl"></a>
 
 <script>
   const COLORS = [
     ["accent", "Accent (le signal)", "accent-box"],
-    ["papier", "Papier", "light-box"],
-    ["papierCarte", "Papier carte", "light-box"],
-    ["papierCreux", "Papier creux", "light-box"],
-    ["filetFane", "Filet fane", "light-box"],
-    ["encre", "Encre", "light-box"],
-    ["texteSourd", "Texte sourd", "light-box"],
-    ["sombreSurface", "Surface", "dark-box"],
-    ["sombreSurfaceHaute", "Surface haute", "dark-box"],
-    ["sombreBordure", "Bordure", "dark-box"],
-    ["sombreTexte", "Texte", "dark-box"],
-    ["sombreTexteSourd", "Texte sourd", "dark-box"],
-    ["sombreAccentTexte", "Accent texte", "dark-box"]
+    ["papier", "Papier", "light-box"], ["papierCarte", "Papier carte", "light-box"],
+    ["papierCreux", "Papier creux", "light-box"], ["filetFane", "Filet fane", "light-box"],
+    ["encre", "Encre", "light-box"], ["texteSourd", "Texte sourd", "light-box"],
+    ["sombreSurface", "Surface", "dark-box"], ["sombreSurfaceHaute", "Surface haute", "dark-box"],
+    ["sombreBordure", "Bordure", "dark-box"], ["sombreTexte", "Texte", "dark-box"],
+    ["sombreTexteSourd", "Texte sourd", "dark-box"], ["sombreAccentTexte", "Accent texte", "dark-box"]
   ];
   const RADII = [["pilule", "Pilule"], ["carte", "Carte"], ["feuille", "Feuille"]];
 
@@ -95,17 +138,6 @@
     inp.addEventListener("input", () => document.getElementById("v-" + id).textContent = inp.value);
   }
 
-  const PRESETS = {
-    edito:  { accent: "#2B47E8", radii: { pilule: 999, carte: 12, feuille: 18 } },
-    maison: { accent: "#1E6B4F", radii: { pilule: 999, carte: 2,  feuille: 4  } },
-    orbit:  { accent: "#7C5CFF", radii: { pilule: 999, carte: 20, feuille: 26 } }
-  };
-  document.querySelectorAll("[data-preset]").forEach((b) => b.addEventListener("click", () => {
-    const p = PRESETS[b.dataset.preset];
-    document.getElementById("c-accent").value = p.accent;
-    for (const k of ["pilule", "carte", "feuille"]) document.getElementById("r-" + k).value = p.radii[k];
-  }));
-
   const collect = () => {
     const colors = {}, radii = {};
     for (const [key] of COLORS) colors[key] = document.getElementById("c-" + key).value;
@@ -117,25 +149,69 @@
         fort: Number(document.getElementById("g-fort").value),
         densite: Number(document.getElementById("g-dens").value) / 100
       },
-      blur: Number(document.getElementById("g-blur").value)
+      blur: Number(document.getElementById("g-blur").value),
+      scope: document.querySelector('input[name="scope"]:checked').value,
+      apply: {
+        couleurs: document.getElementById("ap-couleurs").checked,
+        radius: document.getElementById("ap-radius").checked,
+        degrades: document.getElementById("ap-degrades").checked,
+        grains: document.getElementById("ap-grains").checked,
+        verre: document.getElementById("ap-verre").checked,
+        rebrancher: document.getElementById("ap-rebrancher").checked
+      }
     };
   };
+  const fill = (p) => {
+    if (p.colors) for (const [key] of COLORS) if (p.colors[key]) document.getElementById("c-" + key).value = p.colors[key];
+    if (p.couleurs) for (const [key] of COLORS) if (p.couleurs[key]) document.getElementById("c-" + key).value = p.couleurs[key];
+    const rad = p.radii || p.radius;
+    if (rad) for (const [key] of RADII) if (typeof rad[key] === "number") document.getElementById("r-" + key).value = rad[key];
+    if (p.grain) {
+      if (typeof p.grain.leger === "number") { document.getElementById("g-leger").value = p.grain.leger; document.getElementById("v-leger").textContent = p.grain.leger; }
+      if (typeof p.grain.fort === "number") { document.getElementById("g-fort").value = p.grain.fort; document.getElementById("v-fort").textContent = p.grain.fort; }
+      if (typeof p.grain.densite === "number") { document.getElementById("g-dens").value = Math.round(p.grain.densite * 100); document.getElementById("v-dens").textContent = Math.round(p.grain.densite * 100); }
+    }
+    if (typeof p.blur === "number") { document.getElementById("g-blur").value = p.blur; document.getElementById("v-blur").textContent = p.blur; }
+  };
 
+  const post = (m) => parent.postMessage({ pluginMessage: m }, "*");
   const applyBtn = document.getElementById("apply");
+
+  document.getElementById("analyze").addEventListener("click", () => post({ type: "analyze", payload: collect() }));
   applyBtn.addEventListener("click", () => {
-    applyBtn.disabled = true;
-    applyBtn.textContent = "Application en cours";
-    parent.postMessage({ pluginMessage: { type: "apply", payload: collect() } }, "*");
+    applyBtn.disabled = true; applyBtn.textContent = "En cours";
+    post({ type: "apply", payload: collect() });
   });
+  document.getElementById("exclude").addEventListener("click", () => post({ type: "exclude" }));
+  document.getElementById("include").addEventListener("click", () => post({ type: "include" }));
   document.getElementById("export").addEventListener("click", () => {
-    parent.postMessage({ pluginMessage: { type: "export", payload: collect() } }, "*");
+    const p = collect(); p.nom = document.getElementById("charte-nom").value || document.getElementById("charte-list").value || "charte";
+    post({ type: "export", payload: p });
+  });
+  document.getElementById("charte-save").addEventListener("click", () => {
+    const nom = document.getElementById("charte-nom").value.trim();
+    if (!nom) { document.getElementById("err").textContent = "Nomme la charte avant d'enregistrer."; return; }
+    document.getElementById("err").textContent = "";
+    post({ type: "charte-save", nom, payload: collect() });
+  });
+  document.getElementById("charte-delete").addEventListener("click", () => {
+    const nom = document.getElementById("charte-list").value;
+    if (nom) post({ type: "charte-delete", nom });
+  });
+  document.getElementById("charte-list").addEventListener("change", (e) => {
+    if (e.target.value) post({ type: "charte-load", nom: e.target.value });
+  });
+  document.getElementById("charte-import").addEventListener("click", () => {
+    try {
+      fill(JSON.parse(document.getElementById("charte-json").value));
+      document.getElementById("err").textContent = "";
+    } catch (e) { document.getElementById("err").textContent = "JSON illisible : " + e.message; }
   });
 
   const download = (name, text) => {
     const a = document.getElementById("dl");
     a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
-    a.download = name;
-    a.click();
+    a.download = name; a.click();
   };
 
   onmessage = (e) => {
@@ -143,19 +219,33 @@
     if (!m) return;
     if (m.type === "state") {
       if (m.state.error) { document.getElementById("err").textContent = m.state.error; return; }
-      for (const [key] of COLORS) if (m.state.colors[key]) document.getElementById("c-" + key).value = m.state.colors[key];
-      for (const [key] of RADII) if (typeof m.state.radii[key] === "number") document.getElementById("r-" + key).value = m.state.radii[key];
+      fill(m.state);
+      const list = document.getElementById("charte-list");
+      const cur = list.value;
+      list.innerHTML = '<option value="">Charte courante du fichier</option>';
+      for (const nom of m.state.chartes || []) {
+        const o = document.createElement("option");
+        o.value = nom; o.textContent = nom; list.appendChild(o);
+      }
+      list.value = cur && (m.state.chartes || []).includes(cur) ? cur : "";
+    }
+    if (m.type === "charte") { fill(m.payload); document.getElementById("charte-nom").value = m.nom; }
+    if (m.type === "selection") {
+      document.getElementById("selinfo").textContent = m.count ? "(" + m.count + (m.excluded ? ", dont " + m.excluded + " hors charte" : "") + ")" : "(vide)";
+    }
+    if (m.type === "analysis") {
+      const r = document.getElementById("report"); r.style.display = "block";
+      const s = m.st;
+      r.textContent = s.error ? s.error :
+        "Sans rien ecrire : " + s.grads + " degrades concernes, " + s.noise + " grains, " + s.blur + " verres, " +
+        s.rebound + " couleurs rebranchables, " + s.excluded + " element(s) hors charte respectes, sur " + s.roots + " racine(s).";
     }
     if (m.type === "applied") {
-      applyBtn.disabled = false;
-      applyBtn.textContent = "Appliquer a tout le fichier";
-      if (m.res && m.res.error) document.getElementById("err").textContent = m.res.error;
+      applyBtn.disabled = false; applyBtn.textContent = "Appliquer";
+      if (m.st && m.st.error) document.getElementById("err").textContent = m.st.error;
     }
-    if (m.type === "files") {
-      download("tokens.json", m.json);
-      setTimeout(() => download("charte.css", m.css), 300);
-    }
+    if (m.type === "files") { download("tokens.json", m.json); setTimeout(() => download("charte.css", m.css), 300); }
   };
 
-  parent.postMessage({ pluginMessage: { type: "init" } }, "*");
+  post({ type: "init" });
 </script>
