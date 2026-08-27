@@ -419,7 +419,8 @@ async function generateStarter(choices) {
   await figma.setCurrentPageAsync(page);
   let x = 0;
   const made = [];
-  const place = (comp) => { comp.x = x; comp.y = 0; x += comp.width + 80; made.push(comp.name); };
+  const nodes = [];
+  const place = (comp) => { comp.x = x; comp.y = 0; x += comp.width + 80; made.push(comp.name); nodes.push(comp); };
 
   if (choices.generate.buttons) {
     const mk = (variantName, primary) => {
@@ -532,6 +533,11 @@ async function generateStarter(choices) {
     page.appendChild(c); place(c);
   }
 
+  // Take the user by the hand: jump straight to what was just created.
+  if (nodes.length) {
+    figma.currentPage.selection = nodes;
+    figma.viewport.scrollAndZoomIntoView(nodes);
+  }
   return { made };
 }
 

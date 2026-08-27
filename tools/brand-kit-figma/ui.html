@@ -39,17 +39,22 @@
   .live-hint { color: #6B6A66; font-size: 11px; }
 </style>
 
-<div class="setup" id="setup">
-  <p>This file has no brand kit yet. The wizard asks three questions and
-  generates the variables plus a starter set of components, all bound: move a
-  token later, everything follows.</p>
-  <button class="primary" id="wizard-open">Run the setup wizard</button>
-  <div class="btnrow"><button class="mini" id="bootstrap">Variables only, no components</button></div>
-</div>
+<div class="setup" id="setup" style="display:none"></div>
 
 <div class="setup" id="wizard" style="display:none">
-  <div id="wz-1">
-    <p><b>1 / 3, the basics.</b> The accent is the one color that points.</p>
+  <div id="wz-0">
+    <p style="font-size:14px;font-weight:600;color:#141414">Welcome. Let's build your brand kit.</p>
+    <p>In 3 quick steps you pick your color, your shapes, and I create
+    <b>one new page in this file called "Brand Kit"</b> with ready-made
+    buttons, cards and more, all in your brand.</p>
+    <p>Nothing else in your file is touched. Everything stays changeable
+    afterwards, from the Tokens tab.</p>
+    <div class="btnrow"><button class="primary" id="wz-start">Start, step 1 of 3</button></div>
+    <div class="btnrow"><button class="mini" id="bootstrap">Advanced: variables only, no components</button></div>
+  </div>
+  <div id="wz-1" style="display:none">
+    <p><b>Step 1 of 3: your colors.</b> The accent is your brand's one
+    strong color, the one buttons and highlights will use.</p>
     <div class="row"><label>Accent</label><input type="color" id="wz-accent" value="#2B47E8"></div>
     <div class="row"><label>Paper (light ground)</label><input type="color" id="wz-paper" value="#F7F5F2"></div>
     <div class="row"><label>Dark surface</label><input type="color" id="wz-dark" value="#161615"></div>
@@ -62,7 +67,8 @@
     <div class="btnrow"><button class="primary" id="wz-next-1">Next</button></div>
   </div>
   <div id="wz-2" style="display:none">
-    <p><b>2 / 3, the shape.</b> Radii and materials, adjustable forever after.</p>
+    <p><b>Step 2 of 3: your shapes.</b> How round the corners are, and how
+    much texture. You can change all of this later.</p>
     <div class="radios">
       <label><input type="radio" name="wz-shape" value="sharp"> Sharp (0)</label>
       <label><input type="radio" name="wz-shape" value="soft" checked> Soft (12 / 18)</label>
@@ -73,8 +79,8 @@
     <div class="btnrow"><button class="ghost" id="wz-back-2">Back</button><button class="primary" id="wz-next-2">Next</button></div>
   </div>
   <div id="wz-3" style="display:none">
-    <p><b>3 / 3, the starter components.</b> Generated on a "Brand Kit" page,
-    every one bound to the variables.</p>
+    <p><b>Step 3 of 3: what I create for you.</b> These land on a new
+    "Brand Kit" page in this file, already in your brand.</p>
     <div class="checks">
       <label><input type="checkbox" id="wz-buttons" checked> Buttons</label>
       <label><input type="checkbox" id="wz-cards" checked> Card</label>
@@ -83,7 +89,16 @@
       <label><input type="checkbox" id="wz-station" checked> Diagram disc</label>
       <label><input type="checkbox" id="wz-nav" checked> Nav bar</label>
     </div>
-    <div class="btnrow"><button class="ghost" id="wz-back-3">Back</button><button class="primary" id="wz-generate">Generate the kit</button></div>
+    <div class="btnrow"><button class="ghost" id="wz-back-3">Back</button><button class="primary" id="wz-generate">Create my kit</button></div>
+  </div>
+  <div id="wz-done" style="display:none">
+    <p style="font-size:14px;font-weight:600;color:#141414">Done. Your kit is right there on the canvas.</p>
+    <p>I created the "Brand Kit" page and jumped you to it. What you can do now:</p>
+    <p>1. Open the <b>Tokens</b> tab, tick <b>Live</b>, and drag the accent
+    color: watch everything follow.<br>
+    2. Copy any component onto your design pages and build with it.<br>
+    3. Save this look under a name in the <b>Kits</b> tab.</p>
+    <div class="btnrow"><button class="primary" id="wz-close">Open the Tokens tab</button></div>
   </div>
 </div>
 
@@ -273,12 +288,18 @@
 
   // ----- wizard
   const wzShow = (n) => {
-    document.getElementById("setup").style.display = "none";
     document.getElementById("wizard").style.display = "block";
-    for (const i of [1, 2, 3]) document.getElementById("wz-" + i).style.display = i === n ? "block" : "none";
+    for (const i of [0, 1, 2, 3, "done"]) {
+      const el = document.getElementById("wz-" + i);
+      if (el) el.style.display = String(i) === String(n) ? "block" : "none";
+    }
   };
-  document.getElementById("wizard-open").addEventListener("click", () => wzShow(1));
-  document.getElementById("wizard-open-2").addEventListener("click", () => wzShow(1));
+  document.getElementById("wz-start").addEventListener("click", () => wzShow(1));
+  document.getElementById("wizard-open-2").addEventListener("click", () => wzShow(0));
+  document.getElementById("wz-close").addEventListener("click", () => {
+    document.getElementById("wizard").style.display = "none";
+    document.getElementById("tab-tokens").click();
+  });
   document.getElementById("wz-next-1").addEventListener("click", () => wzShow(2));
   document.getElementById("wz-back-2").addEventListener("click", () => wzShow(1));
   document.getElementById("wz-next-2").addEventListener("click", () => wzShow(3));
@@ -371,14 +392,13 @@
     const m = e.data.pluginMessage;
     if (!m) return;
     if (m.type === "wizard-done") {
-      document.getElementById("wizard").style.display = "none";
       document.getElementById("wz-generate").disabled = false;
-      document.getElementById("wz-generate").textContent = "Generate the kit";
-      if (m.error) document.getElementById("err").textContent = m.error;
+      document.getElementById("wz-generate").textContent = "Create my kit";
+      if (m.error) { document.getElementById("err").textContent = m.error; wzShow(3); }
+      else wzShow("done");
     }
     if (m.type === "state") {
-      if (document.getElementById("wizard").style.display !== "block")
-        document.getElementById("setup").style.display = m.state.missing ? "block" : "none";
+      if (m.state.missing && document.getElementById("wizard").style.display !== "block") wzShow(0);
       fill(m.state.missing ? m.state.defaults : m.state);
       const list = document.getElementById("kit-list");
       const cur = list.value;
