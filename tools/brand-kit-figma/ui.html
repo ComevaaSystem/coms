@@ -1,8 +1,11 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   * { box-sizing: border-box; margin: 0; font-family: "Archivo", -apple-system, "Segoe UI", sans-serif; }
   body { background: #F7F5F2; color: #141414; padding: 12px 14px; font-size: 12px; }
-  h2 { font-size: 11px; font-weight: 600; margin: 12px 0 6px; }
+  h2 { font-size: 11px; font-weight: 400; margin: 14px 0 6px; color: #6B6A66; font-family: "IBM Plex Mono", ui-monospace, monospace; }
   .card { background: #FCFBF9; border: 1px solid #B9B5AB; border-radius: 10px; padding: 8px 12px; }
+  :focus-visible { outline: 1.5px solid #2B47E8; outline-offset: 1px; }
+  input:focus, select:focus, textarea:focus, button:focus { outline: 1.5px solid #2B47E8; outline-offset: 1px; }
   .row { display: flex; align-items: center; justify-content: space-between; padding: 3px 0; gap: 8px; }
   .row label { color: #3f3e3b; flex: 1; }
   input[type="color"] { width: 42px; height: 22px; border: 1px solid #B9B5AB; border-radius: 6px; padding: 0 2px; background: #fff; }
@@ -21,9 +24,10 @@
   .ghost { background: transparent; border: 1px solid #B9B5AB; border-radius: 999px; padding: 7px 10px; color: #141414; flex: 1; }
   .ghost:hover { border-color: #2B47E8; color: #2B47E8; }
   .mini { border: 1px solid #B9B5AB; background: #FCFBF9; border-radius: 6px; padding: 4px 8px; font-size: 11px; }
-  .report { background: #EDF0FF; border: 1px solid #2B47E8; border-radius: 8px; padding: 8px 10px; color: #1b2fb4; margin-top: 8px; display: none; line-height: 1.5; }
-  .setup { background: #EDF0FF; border: 1px solid #2B47E8; border-radius: 10px; padding: 12px; margin-bottom: 12px; display: none; }
-  .setup p { color: #1b2fb4; line-height: 1.5; margin-bottom: 8px; }
+  .report { background: #FCFBF9; border: 1px solid #B9B5AB; border-radius: 10px; padding: 8px 10px; color: #141414; margin-top: 8px; display: none; line-height: 1.5; }
+  .setup { background: #FCFBF9; border: 1px solid #B9B5AB; border-radius: 10px; padding: 14px; margin-bottom: 12px; display: none; }
+  .setup p { color: #3f3e3b; line-height: 1.5; margin-bottom: 8px; }
+  .eyebrow { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; color: #2B47E8; margin-bottom: 6px; }
   .note { color: #6B6A66; margin-top: 8px; line-height: 1.45; }
   .err { color: #b02020; margin-top: 8px; }
   .selinfo { color: #6B6A66; font-size: 11px; }
@@ -43,14 +47,12 @@
 
 <div class="setup" id="wizard" style="display:none">
   <div id="wz-0">
-    <p style="font-size:14px;font-weight:600;color:#141414">Welcome. Let's build your brand kit.</p>
-    <p>In 3 quick steps you pick your color, your shapes, and I create
-    <b>one new page in this file called "Brand Kit"</b> with ready-made
-    buttons, cards and more, all in your brand.</p>
-    <p>Nothing else in your file is touched. Everything stays changeable
-    afterwards, from the Tokens tab.</p>
-    <div class="btnrow"><button class="primary" id="wz-start">Start, step 1 of 3</button></div>
-    <div class="btnrow"><button class="mini" id="bootstrap">Advanced: variables only, no components</button></div>
+    <div class="eyebrow">3 steps, 1 minute</div>
+    <p style="font-size:15px;font-weight:600;color:#141414;margin-bottom:6px">Let's build your brand kit.</p>
+    <p>Pick a color and a shape. You get a "Brand Kit" page with ready-made
+    components. Nothing else is touched.</p>
+    <div class="btnrow"><button class="primary" id="wz-start">Start</button></div>
+    <div class="btnrow"><button class="mini" id="bootstrap">Advanced: variables only</button></div>
   </div>
   <div id="wz-1" style="display:none">
     <p><b>Step 1 of 3: your colors.</b> The accent is your brand's one
@@ -92,16 +94,14 @@
     <div class="btnrow"><button class="ghost" id="wz-back-3">Back</button><button class="primary" id="wz-generate">Create my kit</button></div>
   </div>
   <div id="wz-done" style="display:none">
-    <p style="font-size:14px;font-weight:600;color:#141414">Done. Your kit is right there on the canvas.</p>
-    <p>I created the "Brand Kit" page and jumped you to it. What you can do now:</p>
-    <p>1. Open the <b>Tokens</b> tab, tick <b>Live</b>, and drag the accent
-    color: watch everything follow.<br>
-    2. Copy any component onto your design pages and build with it.<br>
-    3. Save this look under a name in the <b>Kits</b> tab.</p>
-    <div class="btnrow"><button class="primary" id="wz-close">Open the Tokens tab</button></div>
+    <div class="eyebrow">done</div>
+    <p style="font-size:15px;font-weight:600;color:#141414;margin-bottom:6px">Your kit is on the canvas.</p>
+    <p>Now: open <b>Tokens</b>, tick <b>Live</b>, drag the accent. Everything follows.</p>
+    <div class="btnrow"><button class="primary" id="wz-close">Open Tokens</button></div>
   </div>
 </div>
 
+<div id="main">
 <div class="tabs">
   <button id="tab-start" class="on">Start</button>
   <button id="tab-tokens">Tokens</button>
@@ -111,22 +111,13 @@
 
 <!-- ============ START : always the first screen ============ -->
 <div class="tab on" id="panel-start">
-  <div class="card" style="padding:14px">
-    <p style="font-size:14px;font-weight:600;margin-bottom:6px">This is your brand's control room.</p>
-    <p style="line-height:1.5;color:#3f3e3b">Your colors, corner shapes and
-    textures live here as one kit. Change something, the whole file follows.
-    Nothing is ever touched without you pressing a button.</p>
-  </div>
-  <div class="card" style="margin-top:10px;padding:14px">
-    <p id="start-status" style="line-height:1.5;color:#3f3e3b;margin-bottom:8px"></p>
-    <div class="btnrow"><button class="primary" id="start-wizard">Create a kit, 3 guided steps</button></div>
-    <div class="btnrow"><button class="ghost" id="start-tokens">Change my colors and shapes</button></div>
-  </div>
-  <div class="card" style="margin-top:10px;padding:14px">
-    <p style="font-weight:600;margin-bottom:4px">Try it in 10 seconds</p>
-    <p style="line-height:1.5;color:#3f3e3b">Go to <b>Tokens</b>, tick
-    <b>Live</b>, then drag the Accent color. Watch your whole file change,
-    then change back. That is the entire idea.</p>
+  <div class="card" style="padding:16px">
+    <div class="eyebrow">brand kit</div>
+    <p style="font-size:15px;font-weight:600;margin-bottom:6px">One kit. Change a token, the file follows.</p>
+    <p id="start-status" style="line-height:1.5;color:#3f3e3b;margin-bottom:10px"></p>
+    <div class="btnrow"><button class="primary" id="start-wizard">Create a kit</button></div>
+    <div class="btnrow"><button class="ghost" id="start-tokens">Edit colors and shapes</button></div>
+    <p style="line-height:1.5;color:#6B6A66;margin-top:10px;font-size:11px">Try: Tokens, tick Live, drag the accent.</p>
   </div>
 </div>
 
@@ -223,6 +214,7 @@
   </div>
 </div>
 
+</div><!-- /main -->
 <div class="err" id="err"></div>
 <a class="dl" id="dl"></a>
 
@@ -313,16 +305,21 @@
   // ----- wizard
   const wzShow = (n) => {
     document.getElementById("wizard").style.display = "block";
+    document.getElementById("main").style.display = "none";
     for (const i of [0, 1, 2, 3, "done"]) {
       const el = document.getElementById("wz-" + i);
       if (el) el.style.display = String(i) === String(n) ? "block" : "none";
     }
   };
+  const wzHide = () => {
+    document.getElementById("wizard").style.display = "none";
+    document.getElementById("main").style.display = "block";
+  };
   document.getElementById("wz-start").addEventListener("click", () => wzShow(1));
   document.getElementById("wizard-open-2").addEventListener("click", () => wzShow(0));
   document.getElementById("start-wizard").addEventListener("click", () => wzShow(0));
   document.getElementById("wz-close").addEventListener("click", () => {
-    document.getElementById("wizard").style.display = "none";
+    wzHide();
     document.getElementById("tab-tokens").click();
   });
   document.getElementById("wz-next-1").addEventListener("click", () => wzShow(2));
@@ -425,8 +422,8 @@
     if (m.type === "state") {
       if (m.state.missing && document.getElementById("wizard").style.display !== "block") wzShow(0);
       document.getElementById("start-status").textContent = m.state.missing
-        ? "This file has no kit yet. Start with the 3 guided steps:"
-        : "This file already has its kit (its colors and shapes are loaded below). You can tune it, or create a fresh one:";
+        ? "No kit in this file yet."
+        : "Kit loaded from this file.";
       fill(m.state.missing ? m.state.defaults : m.state);
       const list = document.getElementById("kit-list");
       const cur = list.value;
