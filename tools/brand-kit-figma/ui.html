@@ -1,0 +1,263 @@
+<style>
+  * { box-sizing: border-box; margin: 0; font-family: "Archivo", -apple-system, "Segoe UI", sans-serif; }
+  body { background: #F7F5F2; color: #141414; padding: 14px 16px; font-size: 12px; }
+  h1 { font-size: 14px; font-weight: 600; }
+  .sub { color: #6B6A66; margin: 2px 0 12px; }
+  h2 { font-size: 11px; font-weight: 600; margin: 14px 0 6px; }
+  .card { background: #FCFBF9; border: 1px solid #B9B5AB; border-radius: 10px; padding: 8px 12px; }
+  .row { display: flex; align-items: center; justify-content: space-between; padding: 3px 0; gap: 8px; }
+  .row label { color: #3f3e3b; flex: 1; }
+  input[type="color"] { width: 42px; height: 22px; border: 1px solid #B9B5AB; border-radius: 6px; padding: 0 2px; background: #fff; }
+  input[type="number"] { width: 56px; border: 1px solid #B9B5AB; border-radius: 6px; padding: 3px 6px; font-size: 12px; background: #fff; }
+  input[type="range"] { flex: 1; accent-color: #2B47E8; }
+  input[type="text"], select, textarea { border: 1px solid #B9B5AB; border-radius: 6px; padding: 5px 8px; font-size: 12px; background: #fff; width: 100%; }
+  textarea { font-family: ui-monospace, monospace; font-size: 10px; height: 90px; }
+  .val { width: 30px; text-align: right; color: #6B6A66; font-variant-numeric: tabular-nums; }
+  .radios, .checks { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .radios label, .checks label { display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 3px 0; }
+  input[type="radio"], input[type="checkbox"] { accent-color: #2B47E8; }
+  .btnrow { display: flex; gap: 6px; margin-top: 6px; }
+  button { cursor: pointer; font-size: 12px; }
+  .primary { background: #2B47E8; color: #fff; border: 0; border-radius: 999px; padding: 9px 0; font-weight: 500; flex: 1; }
+  .primary:disabled { opacity: 0.5; }
+  .ghost { background: transparent; border: 1px solid #B9B5AB; border-radius: 999px; padding: 7px 10px; color: #141414; flex: 1; }
+  .ghost:hover { border-color: #2B47E8; color: #2B47E8; }
+  .mini { border: 1px solid #B9B5AB; background: #FCFBF9; border-radius: 6px; padding: 4px 8px; font-size: 11px; }
+  .report { background: #EDF0FF; border: 1px solid #2B47E8; border-radius: 8px; padding: 8px 10px; color: #1b2fb4; margin-top: 8px; display: none; line-height: 1.5; }
+  .setup { background: #EDF0FF; border: 1px solid #2B47E8; border-radius: 10px; padding: 12px; margin-bottom: 12px; display: none; }
+  .setup p { color: #1b2fb4; line-height: 1.5; margin-bottom: 8px; }
+  .note { color: #6B6A66; margin-top: 8px; line-height: 1.45; }
+  .err { color: #b02020; margin-top: 8px; }
+  .selinfo { color: #6B6A66; font-size: 11px; }
+  a.dl { display: none; }
+  details summary { cursor: pointer; font-size: 11px; font-weight: 600; padding: 4px 0; }
+</style>
+
+<h1>Brand Kit</h1>
+<div class="sub">Pick a scope, check what applies, exclusions are respected.</div>
+
+<div class="setup" id="setup">
+  <p>This file has no "Brand" variable collection yet. Initialize it to start
+  from zero: every token gets created, with the defaults below or with a
+  pasted tokens.json.</p>
+  <button class="primary" id="bootstrap">Initialize brand kit</button>
+</div>
+
+<h2>Kit</h2>
+<div class="card">
+  <div class="row">
+    <select id="kit-list"><option value="">Current file kit</option></select>
+  </div>
+  <div class="btnrow">
+    <input type="text" id="kit-name" placeholder="kit name">
+    <button class="mini" id="kit-save">Save</button>
+    <button class="mini" id="kit-delete">Delete</button>
+  </div>
+  <details style="margin-top:6px">
+    <summary>Import / paste a tokens.json</summary>
+    <textarea id="kit-json" placeholder='{"colors":{"accent":"#2B47E8", ...}}'></textarea>
+    <div class="btnrow"><button class="mini" id="kit-import">Load into panel</button></div>
+  </details>
+</div>
+
+<h2>Scope</h2>
+<div class="card">
+  <div class="radios">
+    <label><input type="radio" name="scope" value="selection"> Selection <span class="selinfo" id="selinfo"></span></label>
+    <label><input type="radio" name="scope" value="page"> Current page</label>
+    <label><input type="radio" name="scope" value="file" checked> Whole file</label>
+  </div>
+  <div class="note">Colors and radii live in variables, which are global by nature. Scope governs gradients, grain, glass and re-linking.</div>
+</div>
+
+<h2>What to apply</h2>
+<div class="card">
+  <div class="checks">
+    <label><input type="checkbox" id="ap-colors" checked> Colors</label>
+    <label><input type="checkbox" id="ap-radii" checked> Radii</label>
+    <label><input type="checkbox" id="ap-gradients" checked> Gradients</label>
+    <label><input type="checkbox" id="ap-grain" checked> Grain</label>
+    <label><input type="checkbox" id="ap-glass" checked> Frosted glass</label>
+    <label><input type="checkbox" id="ap-relink"> Re-link matching colors</label>
+  </div>
+</div>
+
+<h2>Off brand</h2>
+<div class="card">
+  <div class="btnrow">
+    <button class="ghost" id="exclude">Take selection off brand</button>
+    <button class="ghost" id="include">Re-include</button>
+  </div>
+  <div class="note">An off-brand element is detached from variables and ignored by every sweep: the safety valve against "everything looks the same".</div>
+</div>
+
+<h2>Accent</h2>
+<div class="card" id="accent-box"></div>
+<h2>Light range</h2>
+<div class="card" id="light-box"></div>
+<h2>Dark range</h2>
+<div class="card" id="dark-box"></div>
+<h2>Radii</h2>
+<div class="card" id="radius-box"></div>
+<h2>Materials</h2>
+<div class="card" id="mat-box">
+  <div class="row"><label>Light grain (paper, discs)</label><input type="range" id="g-light" min="0" max="20" value="5"><span class="val" id="v-light">5</span></div>
+  <div class="row"><label>Strong grain (capsules, CTA)</label><input type="range" id="g-strong" min="0" max="30" value="12"><span class="val" id="v-strong">12</span></div>
+  <div class="row"><label>Grain density</label><input type="range" id="g-dens" min="10" max="100" value="50"><span class="val" id="v-dens">50</span></div>
+  <div class="row"><label>Frosted glass (blur)</label><input type="range" id="g-blur" min="0" max="80" value="34"><span class="val" id="v-blur">34</span></div>
+</div>
+
+<div class="btnrow" style="margin-top:14px">
+  <button class="ghost" id="analyze">Analyze</button>
+  <button class="primary" id="apply">Apply</button>
+</div>
+<div class="report" id="report"></div>
+<div class="btnrow">
+  <button class="ghost" id="export">Export tokens.json + CSS</button>
+</div>
+<div class="err" id="err"></div>
+<a class="dl" id="dl"></a>
+
+<script>
+  const COLORS = [
+    ["accent", "Accent (the signal)", "accent-box"],
+    ["paper", "Paper", "light-box"], ["paperCard", "Paper card", "light-box"],
+    ["paperInset", "Paper inset", "light-box"], ["lineFaded", "Faded line", "light-box"],
+    ["ink", "Ink", "light-box"], ["textMuted", "Muted text", "light-box"],
+    ["darkSurface", "Surface", "dark-box"], ["darkSurfaceRaised", "Raised surface", "dark-box"],
+    ["darkBorder", "Border", "dark-box"], ["darkText", "Text", "dark-box"],
+    ["darkTextMuted", "Muted text", "dark-box"], ["darkAccentText", "Accent text", "dark-box"]
+  ];
+  const RADII = [["pill", "Pill"], ["card", "Card"], ["sheet", "Sheet"]];
+
+  for (const [key, label, box] of COLORS) {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = '<label>' + label + '</label><input type="color" id="c-' + key + '">';
+    document.getElementById(box).appendChild(row);
+  }
+  for (const [key, label] of RADII) {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = '<label>' + label + '</label><input type="number" id="r-' + key + '" min="0" max="999">';
+    document.getElementById("radius-box").appendChild(row);
+  }
+  for (const id of ["light", "strong", "dens", "blur"]) {
+    const inp = document.getElementById("g-" + id);
+    inp.addEventListener("input", () => document.getElementById("v-" + id).textContent = inp.value);
+  }
+
+  const collect = () => {
+    const colors = {}, radii = {};
+    for (const [key] of COLORS) colors[key] = document.getElementById("c-" + key).value;
+    for (const [key] of RADII) radii[key] = Number(document.getElementById("r-" + key).value);
+    return {
+      colors, radii,
+      grain: {
+        light: Number(document.getElementById("g-light").value),
+        strong: Number(document.getElementById("g-strong").value),
+        density: Number(document.getElementById("g-dens").value) / 100
+      },
+      blur: Number(document.getElementById("g-blur").value),
+      scope: document.querySelector('input[name="scope"]:checked').value,
+      apply: {
+        colors: document.getElementById("ap-colors").checked,
+        radii: document.getElementById("ap-radii").checked,
+        gradients: document.getElementById("ap-gradients").checked,
+        grain: document.getElementById("ap-grain").checked,
+        glass: document.getElementById("ap-glass").checked,
+        relink: document.getElementById("ap-relink").checked
+      }
+    };
+  };
+  const fill = (p) => {
+    if (p.colors) for (const [key] of COLORS) if (p.colors[key]) document.getElementById("c-" + key).value = p.colors[key];
+    if (p.radii) for (const [key] of RADII) if (typeof p.radii[key] === "number") document.getElementById("r-" + key).value = p.radii[key];
+    if (p.grain) {
+      if (typeof p.grain.light === "number") { document.getElementById("g-light").value = p.grain.light; document.getElementById("v-light").textContent = p.grain.light; }
+      if (typeof p.grain.strong === "number") { document.getElementById("g-strong").value = p.grain.strong; document.getElementById("v-strong").textContent = p.grain.strong; }
+      if (typeof p.grain.density === "number") { document.getElementById("g-dens").value = Math.round(p.grain.density * 100); document.getElementById("v-dens").textContent = Math.round(p.grain.density * 100); }
+    }
+    if (typeof p.blur === "number") { document.getElementById("g-blur").value = p.blur; document.getElementById("v-blur").textContent = p.blur; }
+  };
+
+  const post = (m) => parent.postMessage({ pluginMessage: m }, "*");
+  const applyBtn = document.getElementById("apply");
+
+  document.getElementById("bootstrap").addEventListener("click", () => {
+    let payload = null;
+    try { payload = JSON.parse(document.getElementById("kit-json").value); } catch (e) {}
+    post({ type: "bootstrap", payload });
+  });
+  document.getElementById("analyze").addEventListener("click", () => post({ type: "analyze", payload: collect() }));
+  applyBtn.addEventListener("click", () => {
+    applyBtn.disabled = true; applyBtn.textContent = "Working";
+    post({ type: "apply", payload: collect() });
+  });
+  document.getElementById("exclude").addEventListener("click", () => post({ type: "exclude" }));
+  document.getElementById("include").addEventListener("click", () => post({ type: "include" }));
+  document.getElementById("export").addEventListener("click", () => {
+    const p = collect(); p.name = document.getElementById("kit-name").value || document.getElementById("kit-list").value || "brand-kit";
+    post({ type: "export", payload: p });
+  });
+  document.getElementById("kit-save").addEventListener("click", () => {
+    const name = document.getElementById("kit-name").value.trim();
+    if (!name) { document.getElementById("err").textContent = "Name the kit before saving."; return; }
+    document.getElementById("err").textContent = "";
+    post({ type: "kit-save", name, payload: collect() });
+  });
+  document.getElementById("kit-delete").addEventListener("click", () => {
+    const name = document.getElementById("kit-list").value;
+    if (name) post({ type: "kit-delete", name });
+  });
+  document.getElementById("kit-list").addEventListener("change", (e) => {
+    if (e.target.value) post({ type: "kit-load", name: e.target.value });
+  });
+  document.getElementById("kit-import").addEventListener("click", () => {
+    try {
+      fill(JSON.parse(document.getElementById("kit-json").value));
+      document.getElementById("err").textContent = "";
+    } catch (e) { document.getElementById("err").textContent = "Unreadable JSON: " + e.message; }
+  });
+
+  const download = (name, text) => {
+    const a = document.getElementById("dl");
+    a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+    a.download = name; a.click();
+  };
+
+  onmessage = (e) => {
+    const m = e.data.pluginMessage;
+    if (!m) return;
+    if (m.type === "state") {
+      document.getElementById("setup").style.display = m.state.missing ? "block" : "none";
+      fill(m.state.missing ? m.state.defaults : m.state);
+      const list = document.getElementById("kit-list");
+      const cur = list.value;
+      list.innerHTML = '<option value="">Current file kit</option>';
+      for (const name of m.state.kits || []) {
+        const o = document.createElement("option");
+        o.value = name; o.textContent = name; list.appendChild(o);
+      }
+      list.value = cur && (m.state.kits || []).includes(cur) ? cur : "";
+    }
+    if (m.type === "kit") { fill(m.payload); document.getElementById("kit-name").value = m.name; }
+    if (m.type === "selection") {
+      document.getElementById("selinfo").textContent = m.count ? "(" + m.count + (m.excluded ? ", " + m.excluded + " off brand" : "") + ")" : "(empty)";
+    }
+    if (m.type === "analysis") {
+      const r = document.getElementById("report"); r.style.display = "block";
+      const s = m.st;
+      r.textContent = s.error ? s.error :
+        "Dry run: " + s.grads + " gradients affected, " + s.noise + " grain effects, " + s.blur + " glass, " +
+        s.relinked + " colors re-linkable, " + s.excluded + " off-brand element(s) respected, across " + s.roots + " root(s).";
+    }
+    if (m.type === "applied") {
+      applyBtn.disabled = false; applyBtn.textContent = "Apply";
+      if (m.st && m.st.error) document.getElementById("err").textContent = m.st.error;
+    }
+    if (m.type === "files") { download("tokens.json", m.json); setTimeout(() => download("brand.css", m.css), 300); }
+  };
+
+  post({ type: "init" });
+</script>
