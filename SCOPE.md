@@ -102,7 +102,11 @@ moment. Reecus personnels : la methode montree en demo sur un cas fictif.
 
 ## Nom du repo
 
-Non decide. Placeholder de travail jusqu'a la decision, aucun engagement public avant.
+Decide le 2026-08-27 : COMS, Comevaa Open Marketing System. Repo public cible :
+github.com/comevaa/coms. Regle d'usage : le sigle vit a l'ecrit (repo, README, site) ;
+a l'oral on dit "le systeme Comevaa" ou le nom complet, jamais "COMS" seul (collision
+avec "la com'"). Le dossier local garde son nom, le repo public part avec un
+historique git neuf de toute facon.
 
 ## Hors scope V1
 

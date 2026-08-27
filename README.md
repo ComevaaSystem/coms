@@ -1,4 +1,6 @@
-# Comevaa Stack
+# COMS
+
+**Comevaa Open Marketing System.**
 
 > Turn paid media into a measurable pipeline channel.
 
@@ -44,11 +46,11 @@ understand -> media-plan -> meta-ads / google-ads / linkedin-ads
 ## Quick start
 
 ```bash
-git clone <REPO_URL> ~/.claude/skills/comevaa-stack
+git clone https://github.com/comevaa/coms ~/.claude/skills/coms
 ```
 
 Then open Claude Code and run the `understand` skill on your own business. Twenty
-minutes of interview, and you will know whether this stack is for you.
+minutes of interview, and you will know whether this system is for you.
 
 Skills are written in English and run the conversation in your language.
 
@@ -62,7 +64,7 @@ Every existing option gives you half the job:
 | B2B attribution SaaS | Serious closed-loop measurement | 1000+ EUR/month, the tool without the method |
 | Agencies | The thresholds, the experience | All of it kept private, none of it installable |
 
-This stack takes the empty lane: the complete doctrine of one channel, from a
+COMS takes the empty lane: the complete doctrine of one channel, from a
 practitioner, with the closed loop ads-to-CRM built from what the business already
 has (forms, UTMs, a CRM), no extra tool required.
 
