@@ -452,7 +452,10 @@ async function generateStarter(choices) {
 
   const made = [];
   const nodes = [];
+  // A re-run stacks below what already exists instead of on top of it.
   let Y = 0;
+  for (const c of page.children) Y = Math.max(Y, c.y + c.height);
+  if (Y > 0) Y += 200;
   const section = (label) => {
     const t = figma.createText();
     t.fontName = { family, style: semi };
@@ -461,7 +464,8 @@ async function generateStarter(choices) {
     t.fills = [boundSolid(COLOR_VARS.ink)];
     page.appendChild(t);
     t.x = 0; t.y = Y;
-    Y += 44;
+    // Figma draws a component's name label above its frame: leave room for it.
+    Y += 76;
   };
   let rowX = 0, rowMax = 0;
   const place = (node) => {
@@ -472,7 +476,7 @@ async function generateStarter(choices) {
     made.push(node.name);
     nodes.push(node);
   };
-  const endSection = () => { Y += rowMax + 90; rowX = 0; rowMax = 0; };
+  const endSection = () => { Y += rowMax + 130; rowX = 0; rowMax = 0; };
 
   const G = choices.groups || {};
 
