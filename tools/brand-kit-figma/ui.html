@@ -103,13 +103,35 @@
 </div>
 
 <div class="tabs">
-  <button id="tab-tokens" class="on">Tokens</button>
+  <button id="tab-start" class="on">Start</button>
+  <button id="tab-tokens">Tokens</button>
   <button id="tab-kits">Kits</button>
   <button id="tab-options">Options</button>
 </div>
 
+<!-- ============ START : always the first screen ============ -->
+<div class="tab on" id="panel-start">
+  <div class="card" style="padding:14px">
+    <p style="font-size:14px;font-weight:600;margin-bottom:6px">This is your brand's control room.</p>
+    <p style="line-height:1.5;color:#3f3e3b">Your colors, corner shapes and
+    textures live here as one kit. Change something, the whole file follows.
+    Nothing is ever touched without you pressing a button.</p>
+  </div>
+  <div class="card" style="margin-top:10px;padding:14px">
+    <p id="start-status" style="line-height:1.5;color:#3f3e3b;margin-bottom:8px"></p>
+    <div class="btnrow"><button class="primary" id="start-wizard">Create a kit, 3 guided steps</button></div>
+    <div class="btnrow"><button class="ghost" id="start-tokens">Change my colors and shapes</button></div>
+  </div>
+  <div class="card" style="margin-top:10px;padding:14px">
+    <p style="font-weight:600;margin-bottom:4px">Try it in 10 seconds</p>
+    <p style="line-height:1.5;color:#3f3e3b">Go to <b>Tokens</b>, tick
+    <b>Live</b>, then drag the Accent color. Watch your whole file change,
+    then change back. That is the entire idea.</p>
+  </div>
+</div>
+
 <!-- ============ TOKENS : the everyday view ============ -->
-<div class="tab on" id="panel-tokens">
+<div class="tab" id="panel-tokens">
   <h2>Accent</h2>
   <div class="card" id="accent-box"></div>
   <h2>Light range</h2>
@@ -206,14 +228,16 @@
 
 <script>
   // ----- tabs
-  for (const t of ["tokens", "kits", "options"]) {
+  const TABS = ["start", "tokens", "kits", "options"];
+  for (const t of TABS) {
     document.getElementById("tab-" + t).addEventListener("click", () => {
-      for (const u of ["tokens", "kits", "options"]) {
+      for (const u of TABS) {
         document.getElementById("tab-" + u).classList.toggle("on", u === t);
         document.getElementById("panel-" + u).classList.toggle("on", u === t);
       }
     });
   }
+  document.getElementById("start-tokens").addEventListener("click", () => document.getElementById("tab-tokens").click());
 
   const COLORS = [
     ["accent", "Accent (the signal)", "accent-box"],
@@ -296,6 +320,7 @@
   };
   document.getElementById("wz-start").addEventListener("click", () => wzShow(1));
   document.getElementById("wizard-open-2").addEventListener("click", () => wzShow(0));
+  document.getElementById("start-wizard").addEventListener("click", () => wzShow(0));
   document.getElementById("wz-close").addEventListener("click", () => {
     document.getElementById("wizard").style.display = "none";
     document.getElementById("tab-tokens").click();
@@ -399,6 +424,9 @@
     }
     if (m.type === "state") {
       if (m.state.missing && document.getElementById("wizard").style.display !== "block") wzShow(0);
+      document.getElementById("start-status").textContent = m.state.missing
+        ? "This file has no kit yet. Start with the 3 guided steps:"
+        : "This file already has its kit (its colors and shapes are loaded below). You can tune it, or create a fresh one:";
       fill(m.state.missing ? m.state.defaults : m.state);
       const list = document.getElementById("kit-list");
       const cur = list.value;
