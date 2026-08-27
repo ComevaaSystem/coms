@@ -418,6 +418,9 @@ async function generateStarter(choices) {
     const c = figma.createComponent();
     c.name = name;
     c.layoutMode = (o && o.mode) || "VERTICAL";
+    // A fresh component is 100x100; without AUTO sizing every pill becomes an arch.
+    c.primaryAxisSizingMode = "AUTO";
+    c.counterAxisSizingMode = "AUTO";
     c.itemSpacing = (o && o.gap != null) ? o.gap : 10;
     if (o && o.fillVar) c.fills = [boundSolid(o.fillVar)]; else if (o && o.fills) c.fills = o.fills; else c.fills = [];
     if (o && o.strokeVar) { c.strokes = [boundSolid(o.strokeVar)]; c.strokeWeight = o.sw || 1; }
@@ -787,7 +790,9 @@ figma.on("selectionchange", pushSelection);
 figma.ui.onmessage = async (msg) => {
   try {
     if (msg.type === "init") {
-      figma.ui.postMessage({ type: "state", state: await readState() });
+      const state = await readState();
+      state.last = await figma.clientStorage.getAsync("lastKit");
+      figma.ui.postMessage({ type: "state", state });
       pushSelection();
     } else if (msg.type === "bootstrap") {
       const r = await bootstrap(msg.payload);
@@ -796,6 +801,7 @@ figma.ui.onmessage = async (msg) => {
     } else if (msg.type === "live") {
       await liveSet(msg.key, msg.value);
     } else if (msg.type === "wizard-generate") {
+      await figma.clientStorage.setAsync("lastKit", msg.payload);
       await bootstrap(msg.payload);
       const r = await generateStarter(msg.payload);
       if (r.error) figma.notify(r.error, { error: true });
@@ -806,6 +812,7 @@ figma.ui.onmessage = async (msg) => {
       const st = await run(msg.payload, true);
       figma.ui.postMessage({ type: "analysis", st });
     } else if (msg.type === "apply") {
+      await figma.clientStorage.setAsync("lastKit", msg.payload);
       const st = await run(msg.payload, false);
       if (st.error) figma.notify(st.error, { error: true });
       else figma.notify("Applied: " + (st.vars || 0) + " variables, " + st.grads + " gradients, " + st.noise + " grain, " + st.blur + " glass, " + st.relinked + " re-linked");

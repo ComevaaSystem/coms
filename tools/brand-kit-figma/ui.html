@@ -1,7 +1,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   * { box-sizing: border-box; margin: 0; font-family: "Archivo", -apple-system, "Segoe UI", sans-serif; }
-  body { background: #F7F5F2; color: #141414; padding: 12px 14px; font-size: 12px; }
+  body { background: #F7F5F2; color: #141414; padding: 12px 14px 96px; font-size: 12px; }
+  .actionbar { position: fixed; bottom: 0; left: 0; right: 0; background: #F7F5F2; border-top: 1px solid #B9B5AB; padding: 10px 14px; }
+  .actionbar .btnrow { margin-top: 0; }
+  .actionbar .livecheck { display: flex; align-items: center; gap: 6px; margin-top: 6px; color: #6B6A66; font-size: 11px; cursor: pointer; }
   h2 { font-size: 11px; font-weight: 400; margin: 14px 0 6px; color: #6B6A66; font-family: "IBM Plex Mono", ui-monospace, monospace; }
   .card { background: #FCFBF9; border: 1px solid #B9B5AB; border-radius: 10px; padding: 8px 12px; }
   :focus-visible { outline: 1.5px solid #2B47E8; outline-offset: 1px; }
@@ -98,8 +101,7 @@
     <div class="eyebrow">brand kit</div>
     <p style="font-size:15px;font-weight:600;margin-bottom:6px">One kit. Change a token, the file follows.</p>
     <p id="start-status" style="line-height:1.5;color:#3f3e3b;margin-bottom:10px"></p>
-    <div class="btnrow"><button class="primary" id="start-wizard">Create a kit</button></div>
-    <div class="btnrow"><button class="ghost" id="start-tokens">Edit colors and shapes</button></div>
+    <div class="btnrow" id="start-actions"></div>
     <p style="line-height:1.5;color:#6B6A66;margin-top:10px;font-size:11px">Try: Tokens, tick Live, drag the accent.</p>
   </div>
 </div>
@@ -122,14 +124,6 @@
     <div class="row"><label>Frosted glass (blur)</label><input type="range" id="g-blur" min="0" max="80" value="34"><span class="val" id="v-blur">34</span></div>
   </div>
 
-  <div class="btnrow" style="margin-top:12px">
-    <button class="ghost" id="analyze">Analyze</button>
-    <button class="primary" id="apply">Apply</button>
-  </div>
-  <div class="live-bar">
-    <label><input type="checkbox" id="live"> Live</label>
-    <span class="live-hint">colors and radii apply as you drag; gradients and grain need Apply</span>
-  </div>
   <div class="report" id="report"></div>
 </div>
 
@@ -199,6 +193,13 @@
 
 </div><!-- /main -->
 <div class="err" id="err"></div>
+<div class="actionbar" id="actionbar">
+  <div class="btnrow">
+    <button class="ghost" id="analyze">Analyze</button>
+    <button class="primary" id="apply">Apply</button>
+  </div>
+  <label class="livecheck"><input type="checkbox" id="live" checked> Live: colors and radii follow as you drag (gradients and grain need Apply)</label>
+</div>
 <a class="dl" id="dl"></a>
 
 <script>
@@ -212,7 +213,27 @@
       }
     });
   }
-  document.getElementById("start-tokens").addEventListener("click", () => document.getElementById("tab-tokens").click());
+  // The Start actions swap emphasis with the file state: on an equipped file
+  // the big button edits, on an empty one it creates.
+  const renderStartActions = (missing) => {
+    const box = document.getElementById("start-actions");
+    box.innerHTML = "";
+    box.style.flexDirection = "column";
+    const btn = (cls, label, fn) => {
+      const b = document.createElement("button");
+      b.className = cls; b.textContent = label; b.addEventListener("click", fn);
+      box.appendChild(b);
+      return b;
+    };
+    if (missing) {
+      btn("primary", "Create a kit", () => wzShow("create"));
+      btn("ghost", "Edit colors and shapes", () => document.getElementById("tab-tokens").click());
+    } else {
+      btn("primary", "Edit colors and shapes", () => document.getElementById("tab-tokens").click());
+      btn("ghost", "Create a new kit", () => wzShow("create"));
+    }
+  };
+  renderStartActions(true);
 
   const COLORS = [
     ["accent", "Accent (the signal)", "accent-box"],
@@ -289,6 +310,7 @@
   const wzShow = (n) => {
     document.getElementById("wizard").style.display = "block";
     document.getElementById("main").style.display = "none";
+    document.getElementById("actionbar").style.display = "none";
     for (const i of ["create", "done"]) {
       const el = document.getElementById("wz-" + i);
       if (el) el.style.display = i === n ? "block" : "none";
@@ -297,9 +319,9 @@
   const wzHide = () => {
     document.getElementById("wizard").style.display = "none";
     document.getElementById("main").style.display = "block";
+    document.getElementById("actionbar").style.display = "block";
   };
   document.getElementById("wizard-open-2").addEventListener("click", () => wzShow("create"));
-  document.getElementById("start-wizard").addEventListener("click", () => wzShow("create"));
   document.getElementById("wz-cancel").addEventListener("click", wzHide);
   document.getElementById("wz-close").addEventListener("click", () => {
     wzHide();
@@ -398,7 +420,15 @@
       document.getElementById("start-status").textContent = m.state.missing
         ? "No kit in this file yet."
         : "Kit loaded from this file.";
-      fill(m.state.missing ? m.state.defaults : m.state);
+      renderStartActions(!!m.state.missing);
+      // On a bare file, prefer the last kit you worked with over factory defaults.
+      fill(m.state.missing ? (m.state.last || m.state.defaults) : m.state);
+      if (m.state.missing && m.state.last && m.state.last.colors) {
+        if (m.state.last.colors.accent) document.getElementById("wz-accent").value = m.state.last.colors.accent;
+        if (m.state.last.colors.paper) document.getElementById("wz-paper").value = m.state.last.colors.paper;
+        if (m.state.last.colors.darkSurface) document.getElementById("wz-dark").value = m.state.last.colors.darkSurface;
+        if (m.state.last.font) document.getElementById("wz-font").value = m.state.last.font;
+      }
       const list = document.getElementById("kit-list");
       const cur = list.value;
       list.innerHTML = '<option value="">Current file kit</option>';
