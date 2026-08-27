@@ -434,6 +434,9 @@ async function generateStarter(choices) {
     const set = figma.combineAsVariants(comps, page);
     set.name = setName;
     set.layoutMode = "HORIZONTAL"; set.itemSpacing = 24;
+    // The set keeps its pre-layout size unless told to hug its content.
+    set.primaryAxisSizingMode = "AUTO";
+    set.counterAxisSizingMode = "AUTO";
     set.paddingTop = set.paddingBottom = set.paddingLeft = set.paddingRight = 24;
     return set;
   };
