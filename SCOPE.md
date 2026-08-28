@@ -108,6 +108,15 @@ a l'oral on dit "le systeme Comevaa" ou le nom complet, jamais "COMS" seul (coll
 avec "la com'"). Le dossier local garde son nom, le repo public part avec un
 historique git neuf de toute facon.
 
+## Tagline
+
+Decide le 2026-08-28 : "Produisez comme une machine, signez comme une marque."
+Contrainte typo assumee : la display du site n'a pas d'accents, la tagline n'en porte
+aucun. Position : la vitesse de production IA est le gain, la signature de marque est
+la garantie ; l'IA sert, l'humain reste maitre. Usage : hero de la Home (deux lignes,
+cesure apres la virgule). Piste ecartee : les formules "avec l'IA" (generique 2026) et
+les formulations accusatrices ("votre marque ne suit pas").
+
 ## Hors scope V1
 
 MCP public, monetisation, marketplace de plugins, evals au juge modele, cas client
