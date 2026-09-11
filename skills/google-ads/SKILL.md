@@ -76,7 +76,7 @@ Sans les quatre, s'abstenir :
    = volume élevé, qualité poubelle. Unanime.
 4. **Channel reporting surveillé** (dispo depuis 2025) : il dit enfin où part la dépense
    Search/Display/YouTube/Gmail/Maps. Rappel maison : côté API, PMax ne rend des lignes
-   qu'au grain campagne — d'où la double passe `FROM campaign` dans `insights/google.ts`.
+   qu'au grain campagne — d'où une seconde lecture au grain campagne dans tout import.
 
 Asset groups : ne PAS dupliquer par audience (les perfs convergent vers la moyenne).
 Les audience signals sont des suggestions, pas du ciblage : une liste customer match de
@@ -111,8 +111,8 @@ C'est le socle, AVANT toute sophistication d'enchères :
   récupère 30-50 % de l'attribution détruite par les bannières.
 - **Import CRM avec valeurs par étape** : la boucle cible est HubSpot → étapes du cycle
   de vie → upload offline avec valeurs → tROAS. C'est exactement le coût par SQL que
-  Campaign calcule déjà (`stagesAtOrBeyond`) ; l'écart mesuré chez BSB (115 € vs
-  1 396 € par SQL selon la campagne) est invisible pour Google sans cet import.
+  la boucle CRM calcule ; l'écart mesuré sur un compte réel (un facteur douze entre
+  deux campagnes, au coût par SQL) est invisible pour Google sans cet import.
 - **Échéance technique : depuis le 15 juin 2026, les uploads offline passent par la
   Data Manager API** (bloqués dans la Google Ads API). Toute intégration neuve la cible.
 

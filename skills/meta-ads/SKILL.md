@@ -77,7 +77,7 @@ engagement −25 % ET coût par résultat +30 %.
   via CAPI et optimiser sur l'étape aval au lieu du lead brut. Prérequis : instant
   forms, ~50 leads/semaine, étape cible atteinte par 1-40 % des leads sous 28 jours,
   upload au moins quotidien. Atteignable dès ~10-15 k€/mois en B2C. C'est exactement
-  la boucle que Campaign prépare avec `stagesAtOrBeyond`.
+  la boucle ads → CRM au coût par étape.
 - **Ce qui reset le learning** (durci en 2026) : budget ±20 %, bid strategy, audience,
   ajout de créas, changement d'événement. Scaling : +20-25 % tous les 3-4 jours max.
   L'erreur la plus chère : « réparer » une campagne dans ses premiers jours.

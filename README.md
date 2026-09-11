@@ -26,10 +26,10 @@ Six stages. Each one is a skill, each output feeds the next, and the last one fe
 back into the first.
 
 ```
-understand -> media-plan -> meta-ads / google-ads / linkedin-ads
+understand -> plan-media -> meta-ads / google-ads / linkedin-ads
      ^                                                  |
-     |                                          static-briefs / ugc-briefs
-     |                                                  |
+     |                                           brief-creas / brief-ugc
+     |                                              (brand-kit alongside)
      +---------------- steer <---- analyze <------------+
         (the CRM signal, cost per qualified stage, re-feeds the plan)
 ```
@@ -37,22 +37,24 @@ understand -> media-plan -> meta-ads / google-ads / linkedin-ads
 | Stage | Skill | What it does |
 |---|---|---|
 | 1. Understand | `understand` | The discovery interview a senior consultant runs before touching any budget. Run this first. |
-| 2. Plan | `media-plan` | From the business map to a media plan: generic vs focus, dispatch, budget as a setting, not a headline. |
+| 2. Plan | `plan-media` | From the business map to a media plan: generic vs focus, dispatch, budget as a setting, not a headline. |
 | 3. Platform | `meta-ads`, `google-ads`, `linkedin-ads` | The 2026 doctrine of each platform: structures, data thresholds, bidding, measurement. |
-| 4. Create | `static-briefs`, `ugc-briefs` | From validated angles to shoot-ready briefs: static concepts for a designer, combinatorial UGC scripts for a founder on camera. |
-| 5. Analyze | `analyze` | Read the accounts after launch: platforms never added together, cost per CRM stage, never conclude on a stopped campaign. |
-| 6. Steer | `steer` | The weekly ritual: pre-call brief, decisions restated, commitments tracked, work narrated. The client's perception of the work is the leads AND what you tell them. |
+| 4. Create | `brief-creas`, `brief-ugc`, `brand-kit` | From validated angles to shoot-ready briefs: static concepts for a designer, combinatorial UGC scripts for a founder on camera. `brand-kit` runs the design interview that feeds the Figma plugin in `tools/`. |
+| 5. Analyze | `analyze` (next) | Read the accounts after launch: platforms never added together, cost per CRM stage, never conclude on a stopped campaign. |
+| 6. Steer | `steer` (next) | The weekly ritual: pre-call brief, decisions restated, commitments tracked, work narrated. The client's perception of the work is the leads AND what you tell them. |
 
 ## Quick start
 
 ```bash
-git clone https://github.com/comevaa/coms ~/.claude/skills/coms
+git clone https://github.com/ComevaaSystem/coms ~/coms && ~/coms/install.sh
 ```
 
-Then open Claude Code and run the `understand` skill on your own business. Twenty
-minutes of interview, and you will know whether this system is for you.
+`install.sh` links each skill into `~/.claude/skills`. Then open Claude Code and
+type `/understand` on your own business. Twenty minutes of interview, and you will
+know whether this system is for you.
 
-Skills are written in English and run the conversation in your language.
+The skills are written in French, as they run for our clients (`brand-kit` is in
+English). They run the conversation in your language.
 
 ## Why this exists
 
@@ -76,14 +78,14 @@ being written down, the interview patterns mined from real recorded calls. A
 blocking scrub runs in CI: no client name, figure, or deliverable ever ships. What
 ships is the method, always anonymized, never invented.
 
-Releases are monthly. Each changelog tells what that month of client work taught,
+Releases follow the client work. Each changelog entry tells what that work taught,
 and what changed in the skills because of it.
 
 ## Status
 
-Version 0.1.0. `understand` is live. The remaining stages are being rewritten from
-the private French originals, in this order: platform doctrines, media-plan,
-creative briefs, analyze, steer.
+Version 0.2.0. Eight skills are live: `understand`, `plan-media`, `meta-ads`,
+`google-ads`, `linkedin-ads`, `brief-creas`, `brief-ugc`, `brand-kit`. `analyze` and
+`steer` come next.
 
 ## License
 

@@ -14,7 +14,7 @@ mots-clés) → appariement → écriture → présentation. On ne saute pas d'�
 > base, puis il pose des questions — et chaque livrable naît des réponses de CE client,
 > jamais d'un modèle, d'un gabarit, ou de ce qui a été fait pour un autre client.
 
-Payé comptant sur Simplébo (2026-08-24) : un plan et un deck produits en recopiant la
+Payé comptant sur un compte réel (août 2026) : un plan et un deck produits en recopiant la
 structure documentée d'un client précédent, sans une seule question sur le livrable.
 Refusés en bloc. Les trois symptômes de cette faute, à surveiller à chaque étape :
 

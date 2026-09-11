@@ -39,22 +39,22 @@ capture de l'existant) · `rituals` (la structure du point : entre / fait / sort
 ## Le déroulé se CONSTRUIT, il ne se recopie pas
 
 **Aucune diapositive ne s'écrit avant une salve de questions sur le deck lui-même.**
-Le déroulé ci-dessous est celui d'UNE présentation passée (BSB) : c'est un répertoire de
+Le déroulé ci-dessous est celui d'UNE présentation passée : c'est un répertoire de
 ce qui a marché une fois, pas un gabarit. Le recopier pour un autre client produit un
-deck générique qui sent le modèle — vu en vrai sur Simplébo (2026-08-24), refusé.
+deck générique qui sent le modèle — vu en vrai sur un compte réel, refusé.
 
 La salve, trois questions, avec défaut proposé :
 
 1. **Quel est le récit de CE call ?** Qu'est-ce que le client craint, qu'est-ce qui doit
    le rassurer, qu'est-ce qu'il doit décider en sortant ?
-2. **Qu'est-ce qui est au CENTRE ?** Ce que le client a dit attendre (chez Simplébo :
+2. **Qu'est-ce qui est au CENTRE ?** Ce que le client a dit attendre (sur ce compte :
    les messages, les mots-clés, les axes — pas le budget). Ce qui est au centre prend
    les diapositives ; le reste se compresse ou disparaît.
 3. **Qu'est-ce qu'on retire ?** Si le consultant a dit que le budget n'est pas le sujet,
    les diapos budget/cadence se réduisent à une ligne indicative ou sortent du deck —
    les remettre au centre contredit ce qu'il a dit.
 
-Exemple de déroulé (BSB, à ne pas recopier) : couverture → sommaire → 01 état des lieux
+Exemple de déroulé (une présentation réelle, à ne pas recopier) : couverture → sommaire → 01 état des lieux
 (timeline des faits + constats) → 02 le raisonnement (pourquoi l'audience large, PUIS le
 comment avec questionnaire, frise de structure, messages par échéance sectorielle) →
 budget + répartition par étage + cadence → 03 créatif (bascule + méthode combinatoire en
@@ -67,7 +67,7 @@ Le POURQUOI avant le COMMENT, toujours : c'est là que passe l'expertise.
 
 **Le client connaît déjà sa stratégie : ce qui lui manque, c'est de se PROJETER.** Un
 deck qui reste au niveau des angles et des familles se fait dire « plus de concret »
-(Simplébo, 2026-08-24). La section la plus utile est un quasi pré-brief : des exemples
+(retour réel d'un client, août 2026). La section la plus utile est un quasi pré-brief : des exemples
 de requêtes search réelles, des exemples d'annonces rédigées (accroche, texte, bouton),
 l'atterrissage, et ce que testent les déclinaisons. Marqués « exemples à valider » —
 les listes complètes et le QC restent dans `brief-creas`.

@@ -41,7 +41,7 @@ Quand le message décrit un bénéfice futur, il doit dire à partir de quoi ce 
 > "Le jour où son chauffe-eau a un souci, votre client ouvre l'application et voit votre nom."
 
 **Passe**
-> "Posez un boîtier Elax chez un client. Six mois plus tard, son chauffe-eau fait des siennes : il ouvre l'application et voit votre nom."
+> "Posez votre boîtier chez un client. Six mois plus tard, son chauffe-eau fait des siennes : il ouvre l'application et voit votre nom."
 
 ---
 

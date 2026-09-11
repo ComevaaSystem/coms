@@ -96,7 +96,7 @@ pas dire zéro critère, elle veut dire :
   — filtre les curieux sans tuer la conversion.
 - **Synchro CRM native dès le jour 1** (HubSpot) : un lead contacté < 5 min convertit
   9× mieux. Un export CSV hebdo détruit la valeur du format. Vérifier que l'origine
-  campagne arrive côté CRM (la logique `crm_field_map` de Campaign).
+  campagne arrive côté CRM (une correspondance explicite entre le paramètre d'URL et la propriété CRM).
 
 ## Mesure — le canal se juge dans le CRM, sur 6-12 mois
 
