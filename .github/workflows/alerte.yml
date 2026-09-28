@@ -1,0 +1,49 @@
+# Alarm, not a gate: a branch or tag pushed without the local hook (another clone,
+# --no-verify) is only scrubbed once a pull request opens. This reads it within minutes,
+# while the branch can still be deleted and a purge requested. It never blocks a merge
+# (not a required check, and a different job name from "scrub").
+# A push runs the workflow file of the pushed commit: a ref cut before this file existed
+# starts no run. The hourly sweep runs main's copy on every ref. GitHub disables the
+# schedule of a public repository after 60 days without activity: a push re-enables it.
+name: alerte
+on:
+  push:
+    branches-ignore: [main]
+    tags: ['**']
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  alerte:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Scrub the pushed ref
+        if: github.event_name == 'push'
+        env:
+          SCRUB_BLOCKLIST: ${{ secrets.SCRUB_BLOCKLIST }}
+          REF: ${{ github.ref }}
+        # actions/checkout turns the pushed tag into a lightweight one: fetch the real tag
+        # object, message included (a public repository needs no credentials for it).
+        run: |
+          case "$REF" in refs/tags/*) git fetch --force --no-tags origin "+$REF:$REF" ;; esac
+          sh scripts/scan-ref.sh "$REF"
+      - name: Sweep every branch and tag
+        if: github.event_name != 'push'
+        env:
+          SCRUB_BLOCKLIST: ${{ secrets.SCRUB_BLOCKLIST }}
+        run: |
+          rc=0
+          for ref in $(git for-each-ref --format='%(refname)' refs/remotes/origin refs/tags); do
+            case "$ref" in refs/remotes/origin/main|refs/remotes/origin/HEAD) continue ;; esac
+            sh scripts/scan-ref.sh "$ref" || rc=1
+          done
+          exit $rc

@@ -2,19 +2,62 @@
 # The blocklist is NEVER committed. It lives in the SCRUB_BLOCKLIST repository
 # secret (one token per line). The scrub fails on an empty list on purpose: a
 # missing secret must not turn the check green.
+# main only moves through a squash-merged pull request whose "scrub" check is green:
+# the repository ruleset requires it by this job name, renaming the job blocks every merge.
+# Known limit: a pull request that edits the guard itself is judged by its own copy.
+# Such a pull request gets a human read before its merge.
 name: scrub
 on:
+  # A branch is checked through its pull request only: two "scrub" runs on the same commit
+  # would leave the required check ambiguous. Branch pushes without a PR: alerte.yml.
   push:
+    branches: [main]
   pull_request:
+    # "edited": the title becomes main's squash message, a rename is checked again.
+    types: [opened, synchronize, reopened, edited]
+permissions:
+  contents: read
 jobs:
   scrub:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run blocking scrub
+      - name: Test the publication guard
+        run: python3 scripts/test_scrub.py
+      - name: Scrub the tree
         env:
           SCRUB_BLOCKLIST: ${{ secrets.SCRUB_BLOCKLIST }}
         run: python3 scripts/scrub.py
+      # A squash merge brings only the final tree to main, but the pull request keeps
+      # every commit readable: a leak added then removed inside it is still public.
+      - name: Scrub the commits, the title and the branch of the pull request
+        if: github.event_name == 'pull_request'
+        env:
+          SCRUB_BLOCKLIST: ${{ secrets.SCRUB_BLOCKLIST }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          TITLE: ${{ github.event.pull_request.title }}
+          BODY: ${{ github.event.pull_request.body }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          python3 scripts/scrub.py --commits "$HEAD" --not "$BASE"
+          printf '%s\n%s\n%s\n' "$TITLE" "$BRANCH" "$BODY" | python3 scripts/scrub.py --stdin
+      # The squash message is written at merge time, after the pull request's last check.
+      - name: Scrub what just landed on main
+        if: github.event_name == 'push'
+        env:
+          SCRUB_BLOCKLIST: ${{ secrets.SCRUB_BLOCKLIST }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            python3 scripts/scrub.py --commits "$GITHUB_SHA" --not "$BEFORE"
+          else
+            echo "::warning::previous main unknown (first push or force push): scanning the pushed commit only"
+            python3 scripts/scrub.py --commits -n 1 "$GITHUB_SHA"
+          fi
