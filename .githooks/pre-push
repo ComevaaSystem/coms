@@ -1,0 +1,45 @@
+#!/bin/sh
+# This repository is public: a pushed commit stays readable even after its branch is
+# deleted (a pull request keeps refs/pull/N/head). The scrub therefore runs HERE, on
+# everything about to leave the machine, and not only in CI, which reads it after the
+# fact. scripts/install-hooks.sh puts a stub in the git directory that calls this file.
+# Fails closed: no blocklist, an old scrub, a URL instead of a remote name, a ref outside
+# branches and tags, a tag on anything but a commit: nothing leaves.
+zero=0000000000000000000000000000000000000000
+remote="$1"
+refuse() { echo "pre-push: $1 Nothing leaves." >&2; exit 1; }
+scrub() { python3 scripts/scrub.py "$@" >&2; }
+
+cd "$(git rev-parse --show-toplevel)" || refuse "no working tree."
+# An older checkout of scrub.py would ignore --commits and pass on the tree alone.
+[ "$(python3 scripts/scrub.py --handshake 2>/dev/null)" = "scrub-guard-3" ] \
+  || refuse "scripts/scrub.py is missing or too old in this checkout."
+printf '' | scrub --stdin || refuse "no blocklist (.scrub/blocklist.txt)."
+# Commits already on the remote were public before this push: only a named remote says
+# which ones they are.
+git config --get "remote.$remote.url" >/dev/null || refuse "push to a named remote (origin), not to a URL."
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/*|refs/tags/*) ;;
+    *) refuse "only branches and tags are pushed ($remote_ref)." ;;
+  esac
+  # A deletion publishes nothing, and deleting a leaked branch is the fix.
+  [ "$local_sha" = "$zero" ] && continue
+  printf '%s\n%s\n' "$local_ref" "$remote_ref" | scrub --stdin || refuse "a ref name carries client data."
+  # A tag can point at a tag: every message on the way is published.
+  obj="$local_sha"
+  while [ "$(git cat-file -t "$obj")" = tag ]; do
+    git cat-file -p "$obj" | scrub --stdin || refuse "a tag message carries client data."
+    obj=$(git cat-file -p "$obj" | sed -n 's/^object //p' | head -n 1)
+  done
+  [ "$(git cat-file -t "$obj")" = commit ] || refuse "only commits, and tags of commits, are pushed."
+  if [ "$remote_sha" != "$zero" ] && git cat-file -e "$remote_sha^{commit}" 2>/dev/null; then
+    scrub --commits "$obj" --not "$remote_sha" --remotes="$remote" || refuse "see above."
+  else
+    # A new ref, or a remote tip this clone has never seen: everything not already on
+    # this remote is about to become public.
+    scrub --commits "$obj" --not --remotes="$remote" || refuse "see above."
+  fi
+done
+exit 0
