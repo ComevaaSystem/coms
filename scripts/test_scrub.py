@@ -9,6 +9,7 @@ fake name, an ad account id...) is built at run time: written out in this file, 
 trip the very scrub that reads this file.
 """
 
+import base64
 import os
 import random
 import shutil
@@ -160,6 +161,9 @@ class WhatNeverLeaves(Guard):
             self.reset()
 
     def test_a_path_with_neutral_content(self):
+        # A space inside a one-word token never matches ("du pont"): the list holds the
+        # two-word spelling too, as it does for a real client.
+        self.env["SCRUB_BLOCKLIST"] = f"{FAKE}\n{TWO_WORDS}"
         for i, path in enumerate((f"{FAKE}.md", f"docs/{A}%20{B}.md", f"docs/{A}&amp;{B}.md", f"{A_ACCENT}-{B}.md")):
             self.commit(path, "neutral\n")
             self.refused(why="in the path")
@@ -231,6 +235,34 @@ class WhatNeverLeaves(Guard):
             self.refused()
             self.reset()
 
+    def test_a_file_embedded_in_a_text_file(self):
+        jpeg = b"\xff\xd8\xff\xe1" + b"\x00\x10Exif\x00\x00" + "neutral".encode("utf-16-le") + b"\xff\xd9"
+        uri = "data:image/jpeg;base64," + base64.b64encode(jpeg).decode()
+        for i, (name, text) in enumerate((("visuel.svg", f'<svg><image href="{uri}"/></svg>\n'),
+                                          ("notes.md", f"![visuel]({uri})\n"))):
+            self.commit(name, text)
+            self.refused(why="not UTF-8 text")
+            self.reset()
+        payload = base64.b64encode(f'{{"org": "{NAME}"}}'.encode()).decode()
+        self.commit("fixture.json", f'{{"token": "{payload}"}}\n')
+        self.refused()
+
+    def test_a_latin1_tag_message(self):
+        self.git(self.work, "tag", "-a", "v2", "-m", "neutral")
+        # Rewrite the tag with a Latin-1 message, as an old tool would.
+        # The accent is what a lenient reading would lose: the name only exists decoded.
+        self.env["SCRUB_BLOCKLIST"] = TWO_WORDS
+        body = self.run_in_work("git", "cat-file", "tag", "v2").stdout.split(b"\n\n")[0] + b"\n\n" + f"{A_ACCENT} {B}".encode("latin-1") + b"\n"
+        obj = self.run_in_work("git", "hash-object", "-t", "tag", "-w", "--stdin", stdin=body).stdout.decode().strip()
+        self.git(self.work, "tag", "-f", "v2", obj)
+        self.refused("v2", why="tag message")
+
+    def test_a_long_name_spaced_out_or_hyphenated(self):
+        for i, text in enumerate((" ".join(FAKE), ".".join(FAKE), f"{A}-{B}", f"{A}_{B}")):
+            self.commit(f"s{i}.md", f"by {text}\n")
+            self.refused()
+            self.reset()
+
     def test_a_zero_width_space_does_not_glue_a_name_to_the_word_before(self):
         self.commit("zw.md", f"by​{NAME}\n")
         self.refused()
@@ -286,8 +318,8 @@ class WhatNeverLeaves(Guard):
         self.assertEqual(r.returncode, 1)
 
     def test_a_figure_with_or_without_its_thousands_separator(self):
-        self.env["SCRUB_BLOCKLIST"] = "6900"
-        for i, text in enumerate(("6900", "6 900 €", "6.900", "6 900", "6 900")):
+        self.env["SCRUB_BLOCKLIST"] = "6900\n12000\n2,6"
+        for i, text in enumerate(("6900", "6 900 €", "6.900", "6\u202f900", "6\u00a0900", "6,900", "12,000", "12_000", "2,6 %", "2.6")):
             self.commit(f"f{i}.md", f"budget {text}\n")
             self.refused()
             self.reset()
@@ -371,8 +403,27 @@ class WhatLeaves(Guard):
 
     def test_a_figure_is_not_a_time_a_decimal_nor_part_of_a_bigger_number(self):
         self.env["SCRUB_BLOCKLIST"] = "2024\n6900\n2,6"
-        self.commit("notes.md", "at 20:24, a budget of 12024, 69,00 €, the date 20/24, a ratio 2/6\n")
+        self.commit("notes.md", "at 20:24, a budget of 12024, 69,00 €, the date 20/24, a ratio 2/6, le 26 septembre, 2026-08-26\n")
         self.leaves()
+
+    def test_a_short_multi_part_token_does_not_match_glued(self):
+        self.env["SCRUB_BLOCKLIST"] = "C&A"
+        self.commit("notes.md", "ça marche, et le cas est clair\n")
+        self.leaves()
+        self.commit("notes.md", "une campagne pour C & A\n")
+        self.refused()
+
+    def test_a_long_name_is_not_two_ordinary_words(self):
+        self.env["SCRUB_BLOCKLIST"] = "laplace\ndupont"
+        self.commit("notes.md", "à la place du pont, il y a une place\n")
+        self.leaves()
+
+    def test_a_long_line_of_figures_scans_fast(self):
+        import json, time
+        self.commit("series.json", json.dumps([i / 7 for i in range(20_000)]) + "\n")
+        start = time.monotonic()
+        self.leaves()
+        self.assertLess(time.monotonic() - start, 15)
 
     def test_removing_a_line_that_was_already_public(self):
         # The leak predates the guard: the commit that removes it must be able to leave.
@@ -451,6 +502,14 @@ class TreeScans(Guard):
             r = self.scrub(*args)
             self.assertEqual(r.returncode, 0, (args, r.stdout, r.stderr))
             self.assertNotIn(b"Traceback", r.stderr)
+        # The submodule becomes a regular file at the same path: a type change.
+        self.git(self.work, "rm", "-q", "--cached", "vendor/lib")
+        self.write("vendor/lib", "neutral\n")
+        self.git(self.work, "add", "vendor/lib")
+        self.git(self.work, "commit", "-q", "-m", "vendored")
+        r = self.scrub("--commits", "HEAD^!")
+        self.assertEqual(r.returncode, 0, (r.stdout, r.stderr))
+        self.assertNotIn(b"Traceback", r.stderr)
 
 
 class ScanRef(Guard):

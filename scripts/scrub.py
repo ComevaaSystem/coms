@@ -38,6 +38,8 @@ edits the guard judges itself, and gets a human read before its merge.
 """
 
 import argparse
+import base64
+import binascii
 import hashlib
 import html
 import os
@@ -61,18 +63,26 @@ HARD_PATTERNS = [
 ]
 
 WARN_PATTERNS = [
-    ("euro amount, check provenance", re.compile(r"(?<!\d)\d[\d\s.,]{2,}\s?(?:€|EUR)(?!\w)|€\s?\d")),
+    # Bounded runs: an unbounded one is quadratic on a long line of numbers (chart data).
+    ("euro amount, check provenance", re.compile(r"(?<![\d.,])\d[\d\s.,]{2,30}\s?(?:€|EUR)(?!\w)|€\s?\d")),
 ]
 
-# Between two letters of a long word, or two words of a token: up to three spaces or
-# punctuation marks ("Blue - Sky", "blue__sky", "Blue.Sky"). A word shorter than
-# LONG_WORD matches only as written: with separators inside, "isa" would match "is a".
-# The outer word boundaries stay, so a token never fires inside a longer word.
-SEPARATOR = r"[\s!-/:-@\[-`{-~«»‐-―…·•]{0,3}"
+# Punctuation that may split a name: "Blue-Sky", "blue__sky", "Blue.Sky".
+PUNCT = r"!-/:-@\[-`{-~«»‐-―…·•"
+# Between two words of a token: up to three spaces or marks ("Blue - Sky"). Glued is
+# allowed only when the glued form is long enough to be unambiguous: "C&A" glued is "ca".
+SEPARATOR = rf"[\s{PUNCT}]{{0,3}}"
+REQUIRED_SEPARATOR = rf"[\s{PUNCT}]{{1,3}}"
+# Inside one word: marks anywhere ("Du-pont"), or the same separator between every letter
+# ("D u p o n t", "D.u.p.o.n.t"), but never a single space, which turns "Dupont" into
+# "du pont" and "Laplace" into "la place". A word shorter than LONG_WORD matches only as
+# written: with anything inside, "isa" would match "is a".
+MARKS = rf"[{PUNCT}]{{0,2}}"
 LONG_WORD = 6
-# Between the digit groups of a figure: a thousands separator, only where one belongs
-# ("6 900", "6.900"), never a comma, a colon or a slash ("69,00", "20:24", "2/6").
-THOUSANDS = r"[ .']?"
+# Between the digit groups of a figure: a thousands separator, only before a group of three
+# ("6 900", "6,900", "12_000"), so never "69,00", "20:24" or "2/6". A decimal part keeps
+# its mark: "2,6" is not "26".
+THOUSANDS = r"[ .,'’_]?"
 PUBLIC_LOG = os.environ.get("GITHUB_ACTIONS") == "true"
 
 
@@ -135,31 +145,60 @@ def figure_pattern(digits: str) -> str:
     return THOUSANDS.join(re.escape(g) for g in groups)
 
 
-def word_pattern(word: str) -> str:
-    if word.isdigit():
-        return figure_pattern(word)
-    if len(word) >= LONG_WORD:
-        return SEPARATOR.join(re.escape(c) for c in word)
-    return re.escape(word)
+class Patterns:
+    """Builds one alternation; each spaced-out word gets its own group name, so the
+    separator it starts with must repeat between every letter."""
 
+    def __init__(self):
+        self.n = 0
 
-def token_pattern(token: str) -> str | None:
-    words = [w for w in re.split(r"[\W_]+", token) if w]
-    if not words:
-        return None
-    if all(w.isdigit() for w in words):
-        # "2,6" or "6 900": the figure keeps a separator where it had one, and only a
-        # thousands or decimal mark there.
-        return r"[ .,']?".join(figure_pattern(w) for w in words)
-    return SEPARATOR.join(word_pattern(w) for w in words)
+    def word(self, word: str) -> str:
+        if word.isdigit():
+            return figure_pattern(word)
+        if len(word) < LONG_WORD:
+            return re.escape(word)
+        self.n += 1
+        g = f"s{self.n}"
+        chars = [re.escape(c) for c in word]
+        marks = MARKS.join(chars)
+        spaced = chars[0] + rf"(?P<{g}>[\s{PUNCT}]{{1,2}})" + f"(?P={g})".join(chars[1:]) if len(chars) > 1 else chars[0]
+        return f"(?:{marks}|{spaced})"
+
+    def token(self, token: str) -> str | None:
+        words = [w for w in re.split(r"[\W_]+", token) if w]
+        if not words:
+            return None
+        if all(w.isdigit() for w in words):
+            out = figure_pattern(words[0])
+            for w in words[1:]:
+                out += (THOUSANDS if len(w) == 3 else "[.,]") + figure_pattern(w)
+            return out
+        joiner = SEPARATOR if sum(len(w) for w in words) >= LONG_WORD else REQUIRED_SEPARATOR
+        return joiner.join(self.word(w) for w in words)
 
 
 def blocklist_regex(blocklist: list[str]) -> re.Pattern:
-    variants = [p for p in (token_pattern(t) for t in blocklist) if p]
+    patterns = Patterns()
+    variants = [p for p in (patterns.token(t) for t in blocklist) if p]
     return re.compile(r"(?<![a-z0-9])(?:" + "|".join(variants) + r")(?![a-z0-9])")
 
 
 TAG = re.compile(r"<[^>\n]{0,200}>")
+# An image or a file carried inside a text file: it is read like a committed one, so an
+# embedded image is refused as "not UTF-8 text" and embedded text is scanned.
+DATA_URI = re.compile(r"data:[\w.+-]+/[\w.+-]+(?:;[\w=.-]+)*;base64,([A-Za-z0-9+/=_-]+)")
+BASE64_RUN = re.compile(r"[A-Za-z0-9+/_-]{24,}={0,2}")
+MAX_DEPTH = 2
+
+
+def unbase64(s: str) -> bytes | None:
+    s = s + "=" * (-len(s) % 4)
+    for decode in (base64.b64decode, base64.urlsafe_b64decode):
+        try:
+            return decode(s.encode(), validate=True) if decode is base64.b64decode else decode(s.encode())
+        except (binascii.Error, ValueError):
+            continue
+    return None
 JSON_ESCAPE = re.compile(r"\\u([0-9a-fA-F]{4})")
 
 
@@ -217,7 +256,23 @@ class Scan:
                 return m
         return None
 
-    def line(self, where: str, n: int, text: str, warn: bool) -> None:
+    def embedded(self, where: str, n: int, text: str, depth: int) -> None:
+        if depth >= MAX_DEPTH:
+            return
+        for m in DATA_URI.finditer(text):
+            data = unbase64(m.group(1))
+            if data is not None:
+                self.blob(f"{where}:{n} (embedded file)", data, warn=False, depth=depth + 1)
+        # Any other base64 run that decodes to text is text; one that decodes to bytes is
+        # left alone, hashes and ids look like base64 too.
+        for m in BASE64_RUN.finditer(text):
+            data = unbase64(m.group(0))
+            decoded = text_of(data) if data else None
+            if decoded:
+                self.text(f"{where}:{n} (base64)", decoded, depth=depth + 1)
+
+    def line(self, where: str, n: int, text: str, warn: bool, depth: int = 0) -> None:
+        self.embedded(where, n, text, depth)
         m = self.search(text)
         if m:
             self.hits.append(f"{where}:{n}: blocklist token{self.token(m)}")
@@ -242,24 +297,24 @@ class Scan:
                 self.hits.append(f"{where}:{n}: blocklist token across two lines{self.token(m)}")
                 return
 
-    def sequence(self, where: str, seq: list[tuple[int, str, bool]], warn: bool = False) -> None:
+    def sequence(self, where: str, seq: list[tuple[int, str, bool]], warn: bool = False, depth: int = 0) -> None:
         """seq: (line number, text, is it new). New lines are scanned alone; a pair is
         scanned when at least one of its two lines is new."""
         for i, (n, text, new) in enumerate(seq):
             if new:
-                self.line(where, n, text, warn)
+                self.line(where, n, text, warn, depth)
             if i and (new or seq[i - 1][2]):
                 self.pair(where, n, seq[i - 1][1], text)
 
-    def text(self, where: str, text: str, warn: bool = False) -> None:
-        self.sequence(where, [(i, t, True) for i, t in enumerate(lines_of(text), 1)], warn)
+    def text(self, where: str, text: str, warn: bool = False, depth: int = 0) -> None:
+        self.sequence(where, [(i, t, True) for i, t in enumerate(lines_of(text), 1)], warn, depth)
 
-    def blob(self, where: str, data: bytes, warn: bool = True) -> None:
+    def blob(self, where: str, data: bytes, warn: bool = True, depth: int = 0) -> None:
         text = text_of(data)
         if text is None:
             self.hits.append(f"{where}: not UTF-8 text, the scrub cannot read it: convert it to text before it leaves")
         else:
-            self.text(where, text, warn)
+            self.text(where, text, warn, depth)
 
     def path(self, label: str, path: str) -> None:
         m = self.search(path)
@@ -326,7 +381,7 @@ def scan_commits(scan: Scan, rev_args: list[str]) -> None:
         # folder holding only a .gitkeep has no content line to catch it.
         tokens = git_bytes("diff-tree", "-r", "-z", "--no-renames", base, sha).split(b"\0")
         for meta, raw in zip(tokens[0::2], tokens[1::2]):
-            _old_mode, new_mode, old_obj, new_obj, status = meta.decode().lstrip(":").split()
+            old_mode, new_mode, old_obj, new_obj, status = meta.decode().lstrip(":").split()
             if status == "D":
                 continue
             path = scan.raw_path(short, raw)
@@ -334,7 +389,9 @@ def scan_commits(scan: Scan, rev_args: list[str]) -> None:
                 continue
             where = scan.where(short, path)
             data = git_bytes("cat-file", "blob", new_obj)
-            if status == "A" or text_of(data) is None:
+            # A new file, a type change (a submodule or a symlink becoming a file) or
+            # anything not text is read whole: there is no text diff to lean on.
+            if status in ("A", "T") or old_mode in ("160000", "120000") or text_of(data) is None:
                 scan.blob(where, data)
             else:
                 scan.sequence(where, added_with_context(old_obj, new_obj), warn=True)
@@ -399,7 +456,8 @@ def main() -> int:
         scan_entries(scan, git_bytes("ls-tree", "-r", "-z", "--full-tree", args.tree), index=False)
         return scan.report("the tree")
     if args.stdin:
-        scan.text("text", sys.stdin.buffer.read().decode("utf-8", errors="replace"))
+        # Fails closed like a file: a tag message in Latin-1 is refused, not half-read.
+        scan.blob("text", sys.stdin.buffer.read(), warn=False)
         return scan.report("the text")
     scan_entries(scan, git_bytes("ls-files", "-s", "-z"), index=True)
     return scan.report("the index")
