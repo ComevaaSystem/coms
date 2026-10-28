@@ -1,4 +1,4 @@
-# Étape 2 — L'analyse de structure
+# Étape 2 : l'analyse de structure
 
 **C'est l'étape la plus importante du skill, et la seule qu'aucune lecture ne remplace.**
 
@@ -11,8 +11,8 @@ Le skill ne devine pas ici. Il interroge, il restitue, il attend un accord.
 
 ## Comment mener
 
-**Le vrac d'abord.** Inviter le consultant à tout raconter d'un bloc — un audio de dix
-minutes suffit souvent — en lui donnant au besoin les têtes de chapitre de la grille
+**Le vrac d'abord.** Inviter le consultant à tout raconter d'un bloc (un audio de dix
+minutes suffit souvent), en lui donnant au besoin les têtes de chapitre de la grille
 comme fil. Puis ranger chaque phrase au bon endroit de la grille, verbatim, restituer,
 et l'aider à recentrer.
 
@@ -22,8 +22,8 @@ Les questions viennent APRÈS, pour les trous seulement :
 - Trois questions par salve au maximum, groupées par sujet.
 - Proposer une réponse par défaut chaque fois qu'une existe : valider coûte moins que
   rédiger.
-- Une question dont la réponse est en base — ou déjà dans le vrac — est une faute, pas
-  une précaution.
+- Une question dont la réponse est dans ce qui a été fourni, ou déjà dans le vrac, est
+  une faute, pas une précaution.
 
 ## La grille
 
@@ -47,7 +47,7 @@ Les questions viennent APRÈS, pour les trous seulement :
 - Deux offres se disputent-elles la même audience ? Si oui, elles vont ensemble en adsets,
   pas en campagnes concurrentes.
 
-### C. Le dispatch — la question qu'on oublie
+### C. Le dispatch : la question qu'on oublie
 
 Une générique sans dispatch est un tas de leads non triés.
 
@@ -92,7 +92,8 @@ annoncé ne tient pas.
 
 ### G. Les ressources et le process
 
-Cette section décide de l'exécution et se retrouve telle quelle dans le deck.
+Cette section décide de l'exécution. Les rituels passent tels quels dans la
+présentation, comme la cadence mensuelle de la section E.
 
 - Que faut-il **du client** pour que le plan s'exécute ? Personnes pour les UGC, assets de
   marque, accès aux comptes, validations juridiques, matière d'offre.
