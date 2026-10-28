@@ -17,7 +17,7 @@ Format du JSON attendu:
       "message": "Texte exact à afficher sur le visuel",
       "visuel": "Principe visuel décrit au DA",
       "traitement": "Ton et traitement graphique",
-      "format": "4:5",
+      "format": "1:1 + 9:16",
       "assets": "Assets nécessaires",
       "priorite": "P1",
       "inspi": "https://...",
@@ -212,7 +212,7 @@ def main():
         sheet_assets(wb, data["assets"])
 
     wb.save(sys.argv[2])
-    print(f"OK — {len(concepts)} concepts écrits dans {sys.argv[2]}")
+    print(f"OK : {len(concepts)} concepts écrits dans {sys.argv[2]}")
 
 
 if __name__ == "__main__":

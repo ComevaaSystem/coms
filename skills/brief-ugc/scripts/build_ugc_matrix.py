@@ -9,11 +9,11 @@ Format du JSON attendu:
 
 {
   "client": "Nom du client",
-  "intervenant": "Thomas, DG",
+  "intervenant": "Prénom, fonction",
   "themes": [
     {
       "nom": "Revenu",
-      "mots_cles": ["50 a 100 euros de marge", "20 minutes"],
+      "mots_cles": ["plus de creneaux vides", "reservation en ligne, meme le soir"],
       "hooks": [
         "Texte du hook 1",
         "Texte du hook 2"
@@ -26,7 +26,7 @@ Format du JSON attendu:
         "Texte du CTA 1"
       ],
       "inserts": [
-        "Mains qui clipsent le boitier, plan serre"
+        "Agenda en ligne sur l'ecran du telephone, plan serre"
       ]
     }
   ]
@@ -107,7 +107,7 @@ def build_elements(themes):
 def sheet_tournage(wb, themes, elements, intervenant):
     ws = wb.active
     ws.title = "Tournage"
-    ws["A1"] = f"Feuille de tournage — {intervenant}" if intervenant else "Feuille de tournage"
+    ws["A1"] = f"Feuille de tournage : {intervenant}" if intervenant else "Feuille de tournage"
     ws["A1"].font = TITLE_FONT
     ws.append([])
     ws.append(["ID", "Theme", "Type", "Texte / points a faire passer", "Duree cible", "Prises", "Fait"])
@@ -240,7 +240,7 @@ def main():
     n_h = sum(len(e["H"]) for e in elements.values())
     n_c = sum(len(e["C"]) for e in elements.values())
     n_a = sum(len(e["A"]) for e in elements.values())
-    print(f"OK — {len(themes)} themes, {n_h} hooks, {n_c} corps, {n_a} CTA -> {args.sortie}")
+    print(f"OK : {len(themes)} themes, {n_h} hooks, {n_c} corps, {n_a} CTA -> {args.sortie}")
 
 
 if __name__ == "__main__":

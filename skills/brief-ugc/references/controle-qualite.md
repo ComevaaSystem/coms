@@ -6,60 +6,60 @@ Test préalable systématique : **le dire à voix haute**. Une phrase qui se lit
 
 ---
 
-## Test 1 — Le hook tient-il seul ?
+## Test 1 : Le hook tient-il seul ?
 
 Lire la phrase sans le corps, sans le visuel, sans la marque. Si l'auditeur ne sait pas de quoi on parle ni pourquoi c'est un problème, elle ne passe pas.
 
 **Ne passe pas**
-> "Combien de fois êtes-vous reparti chercher la bonne pièce ?"
+> "Combien de créneaux avez-vous perdus cette semaine ?"
 
-On ne sait ni de quel équipement il s'agit, ni pourquoi c'est un problème. "Reparti" est ambigu en plus.
+On ne sait ni de quels créneaux il s'agit, ni pourquoi c'est un problème. "Perdus" est ambigu en plus.
 
 **Passe**
-> "Vous arrivez chez un client, vous ouvrez le chauffe-eau, et la pièce qu'il vous faut est restée au dépôt."
+> "Votre patient de dix-huit heures ne vient pas, ne prévient pas, et le créneau reste vide alors que trois personnes attendaient une place."
 
 La scène est plantée, l'objet est nommé, la frustration est immédiate.
 
 ---
 
-## Test 2 — La solution est-elle nommée ?
+## Test 2 : La solution est-elle nommée ?
 
 Un hook qui pose un problème sans dire ce qu'on propose laisse l'auditeur avec un constat.
 
 **Ne passe pas**
-> "Comment justifier votre devis face à un concurrent moins cher ?"
-> "Vous n'êtes pas obligé de vous battre uniquement sur le prix."
+> "Comment arrêter de passer vos pauses au téléphone ?"
+> "Votre secrétariat n'a pas à être un casse-tête."
 
 **Passe**
-> "Votre client hésite entre vous et un concurrent au même prix. Vous, vous pouvez lui proposer un chauffe-eau connecté."
+> "Vous passez vos pauses à rappeler des patients. Avec la prise de rendez-vous en ligne, ils réservent seuls, même le soir."
 
 ---
 
-## Test 3 — Le lien de cause au produit
+## Test 3 : Le lien de cause au produit
 
 Quand le message décrit un bénéfice futur, il doit dire à partir de quoi ce bénéfice existe. Sans le produit dans la phrase, la scène n'a aucune raison d'être.
 
 **Ne passe pas**
-> "Le jour où son chauffe-eau a un souci, votre client ouvre l'application et voit votre nom."
+> "Le jour où un patient annule, le créneau se remplit tout seul."
 
 **Passe**
-> "Posez un boîtier chez un client. Six mois plus tard, son chauffe-eau fait des siennes : il ouvre l'application et voit votre nom."
+> "Activez la liste d'attente de votre agenda en ligne. Le jour où un patient annule, le créneau est proposé aussitôt au suivant."
 
 ---
 
-## Test 4 — La temporalité
+## Test 4 : La temporalité
 
 On s'adresse à quelqu'un qui n'est **pas encore** client ou partenaire. Le passé composé lui fait dire qu'il a déjà agi.
 
 **Ne passe pas**
-> "Le boîtier que vous avez posé donne à votre client une application..."
+> "L'agenda que vous avez mis en ligne envoie à vos patients un rappel..."
 
 **Passe**
-> "Le jour où vous posez un boîtier, votre client repart avec une application..."
+> "Dès que votre agenda est en ligne, vos patients reçoivent un rappel..."
 
 ---
 
-## Test 5 — Les calques de l'anglais
+## Test 5 : Les calques de l'anglais
 
 Traduits littéralement, ils sonnent consultant, pas professionnel qui parle à un professionnel. Particulièrement audibles à l'oral.
 
@@ -75,21 +75,21 @@ Traduits littéralement, ils sonnent consultant, pas professionnel qui parle à 
 
 ---
 
-## Test 6 — Le style télégraphique
+## Test 6 : Le style télégraphique
 
 Les phrases sans verbe et les "ça, c'est" sonnent bâclé, encore plus à l'oral qu'à l'écrit.
 
 **Ne passe pas**
-> "50 à 100€ de marge, sur un geste qui vous prend 20 minutes."
-> "Un dépannage de chasse d'eau, vous voyez le chauffe-eau à côté. Ça, c'est 50 à 100€."
+> "Deux heures de téléphone en moins, chaque semaine."
+> "Un patient qui oublie, un créneau vide. Ça, c'est une séance non facturée."
 
 **Passe**
-> "Une pose de vingt minutes vous rapporte entre 50 et 100€ de marge."
-> "Vous intervenez chez un client pour autre chose, et son chauffe-eau est juste à côté. C'est une intervention à 50 ou 100€ que vous ne faites pas."
+> "Vos patients réservent seuls, et vous gagnez jusqu'à deux heures de téléphone par semaine."
+> "Quand un patient oublie son rendez-vous, le créneau reste vide. C'est une séance que vous ne facturez pas."
 
 ---
 
-## Test 7 — La phrase est-elle dicible ?
+## Test 7 : La phrase est-elle dicible ?
 
 Test spécifique à la vidéo. Une phrase trop longue ou à la syntaxe complexe fera rater les prises.
 
@@ -102,7 +102,7 @@ Si la personne doit reprendre son souffle au milieu, la phrase est trop longue.
 
 ---
 
-## Test 8 — La promesse est-elle vérifiable ?
+## Test 8 : La promesse est-elle vérifiable ?
 
 Trois niveaux à distinguer :
 - **Fait** : le client peut le prouver. Dicible tel quel.
@@ -110,23 +110,23 @@ Trois niveaux à distinguer :
 - **Projection** : un pourcentage de croissance, un ratio non mesuré. Jamais dicible.
 
 **Ne passe pas**
-> "Vous supprimez un déplacement sur deux."
+> "Vous divisez par deux vos rendez-vous manqués."
 
 Le ratio n'a jamais été mesuré.
 
 **Passe**
-> "Vous supprimez le déplacement de diagnostic."
+> "Chaque patient reçoit un rappel la veille de sa séance."
 
 Même promesse, sans chiffre inventé.
 
 **Vigilance sur les bénéfices récurrents.** Une rémunération ponctuelle ne doit jamais se formuler comme un revenu récurrent.
 
-Ne passe pas : "Un boîtier posé vous rapporte pendant des années."
-Passe : "Un boîtier posé vous ramène le client pendant des années."
+Ne passe pas : "Chaque confrère que vous parrainez vous rapporte tous les mois."
+Passe : "Chaque confrère que vous parrainez vous offre un mois d'abonnement."
 
 ---
 
-## Test 9 — Le CTA
+## Test 9 : Le CTA
 
 Trois conditions cumulatives :
 1. Le bénéfice est rappelé
@@ -136,22 +136,22 @@ Trois conditions cumulatives :
 **Ne passe pas**
 > "Cliquez, répondez à trois questions, on vous rappelle."
 > "Laissez vos coordonnées, on vous rappelle rapidement."
-> "Si vous voulez être partenaire, le formulaire prend deux minutes."
+> "Si vous voulez essayer, le formulaire prend deux minutes."
 
 Dans le troisième cas, c'est le formulaire qui est mis en avant, pas le bénéfice.
 
 **Passe**
-> "Rejoignez les artisans partenaires et facturez chaque chauffe-eau que vous croisez. Quelques questions, deux minutes."
-> "Devenez partenaire et ajoutez une marge sur des interventions que vous faites déjà."
+> "Rejoignez les cabinets qui ne gèrent plus leur agenda au téléphone. Quelques questions, deux minutes."
+> "Passez votre agenda en ligne et retrouvez vos pauses."
 
-**Verbes utiles** : rejoignez, devenez, candidatez, proposez.
+**Verbes utiles** : rejoignez, devenez, essayez, candidatez, proposez.
 **Verbes à éviter** : cliquez, remplissez, laissez vos coordonnées, inscrivez-vous.
 
 Nuance : "candidater" installe l'idée d'une sélection. À utiliser quand le client peut l'assumer. S'il cherche du volume et accepte tout le monde, préférer "rejoignez".
 
 ---
 
-## Test 10 — Le registre et la posture
+## Test 10 : Le registre et la posture
 
 - Registre cohérent avec la cible (vouvoiement par défaut en B2B et sur une cible professionnelle)
 - Pas de familiarité forcée ni d'imitation du langage de métier de la cible
@@ -163,7 +163,7 @@ Une marque qui mime le vocabulaire de sa cible sonne toujours faux. Elle parle c
 
 ---
 
-## Test 11 — L'autonomie combinatoire
+## Test 11 : L'autonomie combinatoire
 
 Spécifique au montage. Chaque élément doit pouvoir s'assembler avec n'importe quel autre du même thème.
 
@@ -177,7 +177,7 @@ Chaque élément commence comme s'il était le premier mot de la vidéo.
 
 ---
 
-## Test 12 — La méfiance côté grand public
+## Test 12 : La méfiance côté grand public
 
 Quand une campagne cible des professionnels mais qu'un particulier peut voir la vidéo, vérifier qu'aucun message ne se retourne.
 

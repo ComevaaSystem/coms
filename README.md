@@ -39,9 +39,11 @@ understand -> plan-media -> meta-ads / google-ads / linkedin-ads
 | 1. Understand | `understand` | The discovery interview a senior consultant runs before touching any budget. Run this first. |
 | 2. Plan | `plan-media` | From the business map to a media plan: generic vs focus, dispatch, budget as a setting, not a headline. |
 | 3. Platform | `meta-ads`, `google-ads`, `linkedin-ads` | The 2026 doctrine of each platform: structures, data thresholds, bidding, measurement. |
-| 4. Create | `brief-creas`, `brief-ugc`, `brand-kit` | From validated angles to shoot-ready briefs: static concepts for a designer, combinatorial UGC scripts for a founder on camera. `brand-kit` runs the design interview that feeds the Figma plugin in `tools/`. |
+| 4. Create | `brief-creas`, `brief-ugc`, `brand-kit`, `kit-components`, `kit-creatives`, `figma-ads` | From validated angles to shoot-ready briefs: static concepts for a designer, combinatorial UGC scripts for a founder on camera. `brand-kit` runs the design interview that feeds the Figma plugin in `tools/`; `kit-components` and `kit-creatives` grow the validated kit into components and ads; `figma-ads` builds the statics in Figma (feed and story, safe zones, tracking names) and proves them before delivery. |
 | 5. Analyze | `analyze` (next) | Read the accounts after launch: platforms never added together, cost per CRM stage, never conclude on a stopped campaign. |
 | 6. Steer | `steer` (next) | The weekly ritual: pre-call brief, decisions restated, commitments tracked, work narrated. The client's perception of the work is the leads AND what you tell them. |
+
+Two skills run alongside every stage: `relecteur-fr`, the French copy review every text passes before it ships, and `playbook`, the method for building a tool with Claude (frame, build, verify, ship) that the loop itself was built with.
 
 ## Quick start
 
@@ -83,9 +85,9 @@ and what changed in the skills because of it.
 
 ## Status
 
-Version 0.2.0. Eight skills are live: `understand`, `plan-media`, `meta-ads`,
-`google-ads`, `linkedin-ads`, `brief-creas`, `brief-ugc`, `brand-kit`. `analyze` and
-`steer` come next.
+Version 0.3.0. Thirteen skills are live: `understand`, `plan-media`, `meta-ads`,
+`google-ads`, `linkedin-ads`, `brief-creas`, `brief-ugc`, `brand-kit`, `kit-components`,
+`kit-creatives`, `figma-ads`, `relecteur-fr`, `playbook`. `analyze` and `steer` come next.
 
 ## License
 

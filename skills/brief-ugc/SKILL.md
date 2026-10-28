@@ -3,13 +3,13 @@ name: brief-ugc
 description: Transforme le contexte d'un client paid (site, brief, transcript de kick off, retours terrain) en scripts UGC combinatoires prêts à tourner, avec hooks, corps et CTA filmés séparément puis assemblés en dizaines de combinaisons. Produit une feuille de tournage exploitable directement par un dirigeant, un client ou un créateur face caméra, avec contrôle qualité systématique des formulations à l'oral. Déclencher dès qu'il est question de scripts UGC, de vidéos face caméra, de contenu créateur, de briefer quelqu'un pour tourner, de hooks vidéo, de témoignages clients en vidéo, ou de produire de la créa vidéo pour des campagnes Meta ou TikTok, même si le mot "UGC" n'est pas prononcé.
 ---
 
-# Brief UGC — méthodo Quentin
+# Brief UGC : la méthode
 
 Objectif : sortir une feuille de tournage combinatoire. Des hooks, des corps et des CTA filmés séparément, assemblés ensuite en dizaines de variantes dont on mesure la performance élément par élément.
 
 ---
 
-## Étape 0 — Absorber le contexte
+## Étape 0 : Absorber le contexte
 
 Rassembler ce qui existe : site, fiche mission, transcript du kick off, retours du sales, vidéos déjà tournées.
 
@@ -24,7 +24,7 @@ Rassembler ce qui existe : site, fiche mission, transcript du kick off, retours 
 
 ---
 
-## Étape 1 — Qui parle
+## Étape 1 : Qui parle
 
 **Décision structurante, à prendre avant d'écrire une ligne.**
 
@@ -41,7 +41,7 @@ Si le referral fonctionne fort chez le client, le témoignage de pair est le for
 
 ---
 
-## Étape 2 — Les thèmes
+## Étape 2 : Les thèmes
 
 Un thème = un bénéfice distinct. 4 à 5 thèmes maximum.
 
@@ -53,10 +53,10 @@ Un thème = un bénéfice distinct. 4 à 5 thèmes maximum.
 
 ---
 
-## Étape 3 — La structure d'un thème
+## Étape 3 : La structure d'un thème
 
 ```
-# Thème N — Nom
+# Thème N : Nom
 
 **Mots clés à faire passer**
 mot · mot · mot · mot
@@ -77,7 +77,7 @@ mot · mot · mot · mot
 
 ---
 
-## Étape 4 — La règle du montage combinatoire
+## Étape 4 : La règle du montage combinatoire
 
 **Aucun élément ne fait référence à un autre.** C'est la contrainte qui rend le montage possible.
 
@@ -87,7 +87,7 @@ Chaque élément est autonome, tourné séparément, deux ou trois prises.
 
 ---
 
-## Étape 5 — Les règles de tournage
+## Étape 5 : Les règles de tournage
 
 À joindre systématiquement au brief :
 
@@ -103,7 +103,7 @@ Le rendu doit ressembler à quelqu'un qui filme, pas à une production. Une cibl
 
 ---
 
-## Étape 6 — Contrôle qualité
+## Étape 6 : Contrôle qualité
 
 Passer chaque hook, corps et CTA au filtre de `references/controle-qualite.md` avant livraison. Un seul test échoué et la formulation est réécrite.
 
@@ -115,7 +115,7 @@ Les deux tests les plus discriminants :
 
 ---
 
-## Étape 7 — Cohérence avec la destination
+## Étape 7 : Cohérence avec la destination
 
 Le CTA promet ce que le parcours doit tenir.
 
@@ -125,7 +125,7 @@ Le CTA promet ce que le parcours doit tenir.
 
 ---
 
-## Étape 8 — Les points à valider
+## Étape 8 : Les points à valider
 
 Terminer chaque livraison par une section listant ce qui engage le client publiquement :
 
