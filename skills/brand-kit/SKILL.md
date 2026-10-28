@@ -38,7 +38,7 @@ Two consequences that frame everything you produce:
 
 **Two entry points.** Some brands arrive with NOTHING: run the interview
 below. Some arrive with an EXISTING art direction (site, brand book, Figma):
-then you do not propose directions, you INGEST — extract the real tokens
+then you do not propose directions, you INGEST: extract the real tokens
 from what exists, show them what you read for correction, fill only the
 gaps (missing states, missing motion, missing rules), and move straight to
 the AI-ready transformation. Redesigning a DA nobody asked you to redesign
@@ -60,17 +60,16 @@ bound to them. Your job is everything before that file.
 
 ## The kit ships as DESIGN.MD, and DESIGN.MD feeds the commons
 
-Every validated kit produces a `DESIGN.MD` in `~/brand-kits/<kit>/`,
-next to tokens.json, the CSS sheet, render-meta.json and the creatives:
-the brand book as a single source of truth, readable by a human and
-applicable by a machine. The `brand-kits` MCP server
-(`~/brand-kits/mcp/server.mjs`) serves every kit to Claude Code, Cursor
-or any agent (`list_kits`, `read_kit`): a client's kit becomes a design
-brain the client's own tools can plug in — the productized form of
+Every validated kit produces a `DESIGN.MD` in the kit folder
+(`<kit-folder>/`), next to tokens.json, the CSS sheet, render-meta.json
+and the creatives: the brand book as a single source of truth, readable
+by a human and applicable by a machine. Keep that folder where any agent
+(Claude Code, Cursor, others) can read it: a client's kit becomes a
+design brain the client's own tools can plug in, the productized form of
 "AI-ready".
 
 And each client's DESIGN.MD FEEDS THE COMMONS, in one direction only:
-MECHANISMS go up (a proven anchor, a template, a rule, an assertion — 
+MECHANISMS go up (a proven anchor, a template, a rule, an assertion,
 recorded in the atelier journal and reusable for the next client), the
 client's VALUES never do (their palette, their claims, their photos stay
 theirs). A mechanism proven on one client becomes a proposable pattern
@@ -79,9 +78,10 @@ commons" section naming exactly what goes up.
 
 ## Step 0, the atelier journal
 
-Before any interview, read `~/.claude/skills/brand-kit/atelier.md`: the
-log of fonts, palette families, accents, textures and signature motifs
-already delivered to previous clients. Hard rotation rule: a new
+Before any interview, read the atelier journal, `atelier.md` next to
+this file (create it empty if it does not exist yet): the log of fonts,
+palette families, accents, textures and signature motifs already
+delivered to previous clients. Hard rotation rule: a new
 direction that lands on an already-delivered combination must change
 family on at least one major axis. For a service selling art directions
 in series, self-repetition is the number one commercial risk. When a kit
@@ -116,8 +116,8 @@ for the holes, in this order, one group at a time:
    highest-resolution original; a site's header often links a full-size
    asset you can fetch yourself). A typographic recreation is allowed in
    PREVIEWS only, always flagged; it never ships in a component batch or a
-   creative. Paid for on a real account: three creatives went out with a redrawn
-   logo because nobody had asked for the real file.
+   creative. A redrawn logo that reaches a published creative is the classic
+   failure of skipping this question.
 4. **Ground and mood.** Warm paper, pure white, or dark first.
 5. **Shape.** Sharp, soft, or round corners. Show, do not describe: this is
    what the preview is for.
@@ -289,17 +289,17 @@ usable elements. A complete kit hands over, beyond tokens and components:
   bare ink, never mixed), plus a handful of custom trade pictos drawn in
   the motif's style. In Figma, EXISTING sets import as SVG (they arrive as
   editable vector trees) and get componentized alongside the drawn ones,
-  recolored through the ink variable — one library page, both origins.
+  recolored through the ink variable: one library page, both origins.
 - **Native Figma effects as effect styles**: the kit's grain token becomes
   a Noise effect style, texture appetite a Texture style, glass moments a
-  Glass style (refraction, depth, dispersion) — all applied from the
+  Glass style (refraction, depth, dispersion), all applied from the
   Effects panel, replacing SVG overlays and background blur inside Figma.
   Shader (Beta) fills are added from the Figma UI first; once present in
   the file they become agent-drivable. Probe which effect types the
   plugin API accepts before writing them; the schema evolves.
 - **A photo library with ONE entry gate**: client photos (sites, teams,
   products) imported as-is and never regenerated, AI-generated images for
-  ambiance and backgrounds ONLY — never a product, a real person, a logo
+  ambiance and backgrounds ONLY, never a product, a real person, a logo
   or text inside the image. Every photo passes the kit's treatment
   (motif masks, legibility scrim, paper-matched tone) before use; the
   Photo slots in mockups point to this library, organized in labeled drop

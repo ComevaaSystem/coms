@@ -219,5 +219,5 @@ End by producing the business map, shown for correction before anything is store
 - **The three riskiest assumptions** currently standing, each phrased so the next
   conversation can kill or confirm it.
 
-This map is the input of the next stage of the stack (`media-plan`). A nearly empty
+This map is the input of the next stage of the stack (`plan-media`). A nearly empty
 map, honestly stated, is a valid output: it is the to-do list of the engagement.

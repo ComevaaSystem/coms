@@ -17,7 +17,7 @@ Itération rapide en conversation, livrable structuré en fichier. Un fichier cr
 ## Scripts UGC (markdown)
 
 ```
-# Client — Scripts UGC [qui parle]
+# [Client] : scripts UGC, [qui parle]
 
 ## Principe
 Qui parle et pourquoi. Ce que ce format porte, ce qu'il ne remplace pas.
@@ -31,7 +31,7 @@ Ce vers quoi le clic renvoie et les contraintes que ça impose.
 
 ---
 
-# Thème 1 — Nom
+# Thème 1 : Nom
 
 **Mots clés à faire passer**
 mot · mot · mot
