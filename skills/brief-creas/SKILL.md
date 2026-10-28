@@ -3,15 +3,17 @@ name: brief-creas
 description: Transforme le contexte d'un client paid (site, brief, transcript de kick off, fiche mission) en axes de communication, messages d'ads, briefs créas statiques et scripts UGC combinatoires prêts à tourner. Produit des livrables exploitables directement par un DA et par un dirigeant face caméra, avec contrôle qualité systématique des formulations. Déclencher dès qu'il est question de préparer des créas, de trouver des angles ou des propositions de valeur, d'écrire des messages d'ads, de briefer un DA, de préparer des scripts UGC ou vidéo, de lancer les campagnes d'un nouveau client, ou après un kick off client, même si les mots "brief" ou "créa" ne sont pas prononcés.
 ---
 
-# Brief créas — méthodo Quentin
+# Brief créas : la méthode
 
 Chaîne de production complète : contexte client → axes → messages → brief DA → scripts UGC → parcours de conversion. Chaque étape s'appuie sur la précédente, on ne saute pas d'étape.
 
+Les axes validés ici sont ceux qu'attend `plan-media` avant d'écrire le plan : ils viennent AVANT le plan, la production créative après.
+
 ---
 
-## Étape 0 — Absorber le contexte
+## Étape 0 : absorber le contexte
 
-Avant toute production, rassembler ce qui existe : site du client, fiche mission, transcript du kick off, comptes ads existants, retours terrain du sales.
+Avant toute production, rassembler ce qui existe : notes et transcripts d'appels, site du client, fiche mission, transcript du kick off, comptes ads existants, retours terrain du sales, la charte (direction artistique et interdits), les destinations du clic (pages, formulaires), et les propositions de valeur déjà proposées ou testées.
 
 **Ce qu'il faut en extraire, dans cet ordre :**
 
@@ -22,11 +24,13 @@ Avant toute production, rassembler ce qui existe : site du client, fiche mission
 5. **Le frein principal à la signature.** Souvent enterré dans un transcript. C'est presque toujours un angle à part entière.
 6. **Les no-go du client.** Ce que la cible rejette (un ton, un format, une promesse déjà retoquée).
 
+**Une proposition déjà testée sans résultat ne se repropose pas.** Une proposition lancée en diffusion qui n'a rien donné, constat confirmé par un humain avec sa preuve, est un angle mort : elle ne revient ni sous un autre nom, ni sous un autre bénéfice qui dit la même chose. Seule une raison nouvelle la rouvre (offre changée, cible changée, destination réparée, fait neuf du client), et cette raison s'écrit à côté de l'axe, avec la preuve de l'angle mort citée.
+
 **Contrôle d'équation à faire systématiquement.** Budget média ÷ CPA cible = nombre maximum de conversions possibles. Si l'objectif annoncé est au-dessus, le dire tout de suite et par écrit. Ne jamais laisser un objectif inatteignable se figer.
 
 ---
 
-## Étape 1 — Les axes
+## Étape 1 : les axes
 
 Sortir 5 à 6 axes maximum. Chaque axe est **un bénéfice distinct**, pas une variation du même.
 
@@ -35,21 +39,27 @@ Sortir 5 à 6 axes maximum. Chaque axe est **un bénéfice distinct**, pas une v
 **Structure de chaque axe :**
 - Le nom en un mot
 - Une ligne de résumé du bénéfice
+- Son genre : bénéfice, preuve ou objection
+- Le ou les faits qui le justifient, avec leur source
 - 3 messages d'ads
+
+**Un axe n'existe que sur un fait sourcé.** Chaque axe cite le fait qui le justifie. Sans fait, le dire et s'arrêter plutôt que de combler par une promesse plausible.
 
 **Deux axes ont un statut particulier :**
 - **Preuve** n'est pas un bénéfice, c'est un véhicule. C'est qui porte le message (un pair, un client, un chiffre d'adoption). Presque toujours le format vidéo prioritaire quand le referral marche.
 - **Objection** traite le frein principal identifié en étape 0. Souvent le meilleur script du lot, et presque toujours oublié.
 
-**Priorisation à recommander :** 3 axes au lancement, portant des bénéfices vraiment différents pour que les learnings soient nets. Confiance et Preuve partent en retargeting ou en vague 2, pas en accroche froide.
+**Priorisation à recommander :** 3 axes au lancement, portant des bénéfices vraiment différents pour que les learnings soient nets. Confiance et Preuve partent en vague 2, pas en accroche froide. Jamais en retargeting : la méthode n'en fait pas, tout tourne en audience large.
+
+**Un axe reste en brouillon tant que le consultant ne l'a pas validé explicitement.** Une fois validé, il se consigne avec sa fiche complète (nom, bénéfice, genre, faits, messages), là où le brief suivant et le plan le reliront. Un brouillon écarté se retire, il ne traîne pas.
 
 ---
 
-## Étape 2 — Les messages
+## Étape 2 : les messages
 
 **Structure obligatoire : en deux temps.** Le problème ou l'attente de la cible d'abord, la réponse de la solution ensuite.
 
-> "Vous croisez des chauffe-eau au quotidien ? Gagnez entre 50€ et 100€ de plus par intervention."
+> "Vos patients vous appellent pendant vos séances ? Laissez-les réserver en ligne, même le soir."
 
 Un message qui n'affiche que le bénéfice sans planter le problème ne fonctionne pas. Un message qui pose le problème sans nommer la solution non plus.
 
@@ -57,15 +67,15 @@ Un message qui n'affiche que le bénéfice sans planter le problème ne fonction
 - La cible est nommée ou identifiable dès les premiers mots
 - Un seul message par visuel, jamais deux idées
 - Lisible en une seconde sur un fil mobile
-- Vouvoiement, registre pro, jamais familier
+- Tutoiement ou vouvoiement : celui de la charte du client, jamais les deux ; registre pro, jamais familier
 - Aucun tiret long
 - Uniquement des chiffres vérifiables. Une fourchette est acceptable si le bas est un fait et le haut défendable, jamais l'inverse
 
-Avant de livrer, passer chaque message au contrôle qualité : lire `references/controle-qualite.md`. Ce fichier liste les formulations qui sautent systématiquement.
+Avant de livrer, passer chaque message au contrôle qualité : lire `references/controle-qualite.md`. Ce fichier liste les formulations qui sautent systématiquement. Les règles fermées (anglicismes, tiret long, emoji, registre, style télégraphique) se rejouent sur chaque axe au moment de le consigner : un échec se réécrit, il ne se cache pas.
 
 ---
 
-## Étape 3 — Le brief créas statiques
+## Étape 3 : le brief créas statiques
 
 Objectif type : 15 concepts. **Ce ne sont pas 15 idées différentes**, ce sont 5 à 6 messages déclinés en variations de traitement.
 
@@ -76,7 +86,7 @@ Objectif type : 15 concepts. **Ce ne sont pas 15 idées différentes**, ce sont 
 **Une ligne de brief par concept :**
 N° · Axe · Nom du concept · Message exact à afficher · Principe visuel · Traitement et ton · Format prioritaire · Assets requis · Priorité P1/P2/P3 · Lien d'inspiration · Note
 
-**Formats :** 4:5 en priorité, 1:1 en secondaire, 9:16 uniquement sur les concepts qui performent.
+**Formats :** carré 1:1 et story 9:16 pour chaque concept, chacun à sa place ; le 4:5 seulement si le client le réclame.
 
 **Toujours joindre trois choses au brief :**
 1. Les règles de production (un message par visuel, pas de look pub, liberté de ton validée)
@@ -85,9 +95,11 @@ N° · Axe · Nom du concept · Message exact à afficher · Principe visuel · 
 
 Le script `scripts/build_brief_xlsx.py` génère le fichier xlsx à trois onglets à partir d'un JSON. Lire son en-tête pour le format d'entrée.
 
+Les statiques se fabriquent ensuite dans Figma à partir de ce brief : le skill `figma-ads` le prend en entrée (JSON ou xlsx).
+
 ---
 
-## Étape 4 — Les scripts UGC
+## Étape 4 : les scripts UGC
 
 **Qui parle change tout.** Un dirigeant assume son rôle de fondateur, il ne mime jamais le métier de la cible. Un client ou un partenaire porte la preuve. Ne jamais écrire un script de dirigeant qui fait semblant d'être un artisan, un recruteur ou un utilisateur.
 
@@ -116,9 +128,9 @@ Le script `scripts/build_brief_xlsx.py` génère le fichier xlsx à trois onglet
 
 ---
 
-## Étape 5 — Cohérence avec la destination
+## Étape 5 : cohérence avec la destination
 
-Le CTA promet quelque chose que le parcours doit tenir. Vérifier systématiquement :
+Le CTA promet quelque chose que le parcours doit tenir. Avant d'écrire un CTA, éprouver la chaîne de chaque destination : l'URL répond, la page garde son code de suivi, et un lead de test arrive bien dans le CRM. Puis vérifier systématiquement :
 
 - **Formulaire (Typeform, Instant Form)** : ne jamais annoncer un nombre de questions qui ne correspond pas au parcours réel. Parler de "quelques questions" ou d'une durée. Ne pas dire "laissez vos coordonnées" si les coordonnées arrivent en fin de parcours. L'écran d'accueil reprend l'angle de la créa.
 - **Landing page** : le titre de la LP reprend le message de la créa, mot pour mot si possible.
@@ -128,7 +140,7 @@ Si le parcours de conversion n'existe pas encore, le proposer : arborescence de 
 
 ---
 
-## Étape 6 — Les points à valider
+## Étape 6 : les points à valider
 
 Terminer chaque livraison par une section listant ce qui engage le client publiquement et doit être validé avant production :
 
@@ -144,7 +156,7 @@ Une promesse qu'un dirigeant découvre dans un script au moment du tournage est 
 
 ## Itération avec le client
 
-Les retours arrivent formulation par formulaire. Quand un message est corrigé, **vérifier que la correction n'est pas perdue dans les livrables suivants**. C'est l'erreur la plus fréquente : une version validée qui revient à son état antérieur deux livrables plus tard.
+Les retours arrivent formulation par formulation. Quand un message est corrigé, **vérifier que la correction n'est pas perdue dans les livrables suivants**. Une correction que le client a tranchée se note avec sa phrase mot pour mot, dans les notes du compte : c'est elle que le brief suivant doit reprendre. C'est l'erreur la plus fréquente : une version validée qui revient à son état antérieur deux livrables plus tard.
 
 Quand le client renvoie un fichier consolidé, faire un contrôle de cohérence complet : reprendre chaque correction demandée dans l'historique et vérifier qu'elle est bien présente. Lister les écarts au lieu de les corriger silencieusement.
 

@@ -48,7 +48,7 @@ Le script `scripts/build_brief_xlsx.py` génère ce fichier à partir d'un JSON.
 ## Scripts UGC (markdown)
 
 ```
-# Client — Scripts UGC [qui parle]
+# Client : scripts UGC [qui parle]
 
 ## Principe
 Qui parle et pourquoi. Rappel du montage combinatoire.
@@ -61,7 +61,7 @@ Ce vers quoi le clic renvoie et les contraintes que ça impose.
 
 ---
 
-# Thème 1 — Nom
+# Thème 1 : nom
 
 **Mots clés à faire passer**
 mot · mot · mot
